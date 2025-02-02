@@ -12,7 +12,7 @@ func NewRestServer() *chi.Mux {
 		w.WriteHeader(http.StatusNotFound)
 		w.Write([]byte(r.URL.RawPath))
 	})
-	r.Route("", func(r chi.Router) {
+	r.Route("/api/v1/providersearch", func(r chi.Router) {
 		r.Get("/health", func(w http.ResponseWriter, r *http.Request) { w.WriteHeader(http.StatusOK) })
 	})
 

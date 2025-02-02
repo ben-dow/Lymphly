@@ -10,5 +10,5 @@ import (
 func main() {
 	r := rest.NewRestServer()
 	adapter := chiadapter.New(r)
-	lambda.Start(adapter.ProxyWithContext)
+	lambda.Start(adapter.Proxy)
 }
