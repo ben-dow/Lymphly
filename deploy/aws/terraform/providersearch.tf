@@ -30,3 +30,9 @@ resource "aws_apigatewayv2_integration" "providersearch_integration" {
   integration_uri = aws_lambda_function.providersearch_lambda.arn
   payload_format_version = "2.0"
 }
+
+resource "aws_apigatewayv2_route" "providersearch" {
+  api_id = aws_apigatewayv2_api.api.id
+  route_key = "ANY /api/v1/providersearch/{proxy+}"
+  target = "integrations/${aws_apigatewayv2_integration.providersearch_integration.id}"
+}
