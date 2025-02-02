@@ -1,11 +1,11 @@
 resource "aws_lambda_function" "providersearch_lambda" {
-    filename = "${var.releases_path}/ProviderSearch_lambda_x86_64.zip"
+    filename = "${var.releases_path}/providersearch_lambda_x86_64.zip"
     function_name = "provider_search"
     role = aws_iam_role.provider_search_role.arn
     runtime = "provided.al2023"
     handler = "bootstrap"
     architectures = [ "x86_64" ]
-    source_code_hash = filemd5("${var.releases_path}/ProviderSearch_lambda_x86_64.zip")
+    source_code_hash = filemd5("${var.releases_path}/providersearch_lambda_x86_64.zip")
 }
 
 resource "aws_apigatewayv2_integration" "providersearch_integration" {
