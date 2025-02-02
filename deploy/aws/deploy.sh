@@ -1,9 +1,6 @@
 #!/bin/bash
 
 # Lymphly Deployer
-# This deployer will deploy Lymply to a given AWS account with the provided keys
-# It is expected that this script is executing in a compiled deployer 
-# With all required parts in their correct locations in the deployer
 
 set -e
 set -x
