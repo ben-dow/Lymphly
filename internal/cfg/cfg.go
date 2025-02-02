@@ -7,7 +7,9 @@ import (
 )
 
 func init() {
-	cfg := &Config{}
+	cfg := &Config{
+		Version: "1.0",
+	}
 	err := env.Parse(cfg)
 	if err != nil {
 		os.Exit(1)
@@ -24,4 +26,5 @@ func Cfg() *Config {
 type Config struct {
 	Region    string `env:"REGION"`
 	TableName string `env:"TABLE_NAME"`
+	Version   string
 }
