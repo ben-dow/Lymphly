@@ -58,4 +58,3 @@ jobs:
           chmod +x ./deploy/aws/deploy.sh
           ./deploy/aws/deploy.sh 
         shell: bash
-
