@@ -1,3 +1,7 @@
+locals {
+  providerupdate_basepath = "/api/v1/providerupdate"
+}
+
 resource "aws_lambda_function" "providerupdate_lambda" {
     filename = "${var.releases_path}/providerupdate_lambda_x86_64.zip"
     function_name = "provider_update"
@@ -6,6 +10,11 @@ resource "aws_lambda_function" "providerupdate_lambda" {
     handler = "bootstrap"
     architectures = [ "x86_64" ]
     source_code_hash = filemd5("${var.releases_path}/providerupdate_lambda_x86_64.zip")
+    environment {
+      variables = {
+        BASE_PATH = local.providerupdate_basepath
+      }
+    }
 }
 
 resource "aws_apigatewayv2_integration" "providerupdate_integration" {
@@ -17,7 +26,7 @@ resource "aws_apigatewayv2_integration" "providerupdate_integration" {
 
 resource "aws_apigatewayv2_route" "providerupdate" {
   api_id = aws_apigatewayv2_api.api.id
-  route_key = "ANY /api/v1/providerupdate/{proxy+}"
+  route_key = "ANY ${local.providerupdate_basepath}/{proxy+}"
   target = "integrations/${aws_apigatewayv2_integration.providerupdate_integration.id}"
 }
 

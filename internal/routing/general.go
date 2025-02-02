@@ -1,10 +1,17 @@
-package routes
+package routing
 
 import (
 	"encoding/json"
 	"lymphly/internal/cfg"
 	"net/http"
+
+	"github.com/go-chi/chi/v5"
 )
+
+func GeneralRoutes(r chi.Router) {
+	r.Get("/health", Health)
+	r.Get("/manifest", Manifest)
+}
 
 func Health(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
