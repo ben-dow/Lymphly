@@ -1,4 +1,4 @@
-data "aws_iam_policy_document" "provider_search_assume_role" {
+data "aws_iam_policy_document" "lambda_execute_assume_policy" {
     statement {
         effect = "Allow"
         principals {
@@ -9,7 +9,7 @@ data "aws_iam_policy_document" "provider_search_assume_role" {
   }
 }
 
-resource "aws_iam_role" "provider_search_role" {
+resource "aws_iam_role" "lambda_execute_role" {
   name = "${var.application_name}-${var.environment_name}-lambda-role"
   assume_role_policy = data.aws_iam_policy_document.provider_search_assume_role.json
 }

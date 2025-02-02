@@ -17,7 +17,7 @@ build/lambda/providersearch:
 	rm bootstrap
 
 build/lambda/providerupdate:
-	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -tags lambda.norpc -o ${RELEASE_DIR}/bootstrap -ldflags "-s -w" ${ROOT_DIR}/cmd/providersearch/main.go
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -tags lambda.norpc -o ${RELEASE_DIR}/bootstrap -ldflags "-s -w" ${ROOT_DIR}/cmd/providerupdate/main.go
 	cd ${RELEASE_DIR}; \
 	zip providerupdate_lambda_x86_64.zip bootstrap; \
 	rm bootstrap
