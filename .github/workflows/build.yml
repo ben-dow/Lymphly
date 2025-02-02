@@ -43,6 +43,7 @@ jobs:
       STATE_BUCKET: ${{ vars.STATE_BUCKET }}
       STATE_REGION: ${{ vars.STATE_REGION }}
       STATE_TABLE: ${{ vars.STATE_TABLE }}
+      RELEASES_PATH: ${{ github.workspace }}/releases
     defaults:
       run:
           working-directory: terraform
@@ -56,5 +57,10 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: releases
-          path: releases
+          path: ${{ github.workspace }}/releases
+      - name: Deploy 
+        run: |
+          chmod +x ./deploy/aws/deploy.sh
+          ./deploy/aws/deploy.sh
+        shell: bash
 
