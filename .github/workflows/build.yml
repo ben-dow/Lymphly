@@ -25,6 +25,11 @@ jobs:
         with:
          name: releases
          path: .build/releases
+      - name: Archive production artifacts
+        uses: actions/upload-artifact@v4
+        with:
+         name: releases
+         path: .build/releases
   deployment:
     name: Deploy
     needs: build
@@ -55,6 +60,6 @@ jobs:
           terraform_version: "1.10.4"
       - uses: actions/download-artifact@v4
         with:
-          name: dist
-          path: dist
+          name: releases
+          path: releases
 
