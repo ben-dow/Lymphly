@@ -18,6 +18,7 @@
 
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
+pushd $SCRIPT_DIR/terraform
 terraform init \
     -backend-config="bucket=$STATE_BUCKET" \
     -backend-config="dynamodb_table=$STATE_TABLE" \
@@ -30,3 +31,4 @@ export TF_VAR_deployment_region="$DEPLOYMENT_REGION"
 export TF_VAR_releases_path="$RELEASES_PATH"
 
 terraform apply -auto-approve
+popd
