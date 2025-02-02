@@ -25,11 +25,6 @@ jobs:
         with:
          name: releases
          path: .build/releases
-      - name: Archive production artifacts
-        uses: actions/upload-artifact@v4
-        with:
-         name: releases
-         path: .build/releases
   deployment:
     name: Deploy
     needs: build
