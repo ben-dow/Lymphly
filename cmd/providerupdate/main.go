@@ -1,6 +1,7 @@
 package main
 
 import (
+	"lymphly/internal/cfg"
 	"lymphly/internal/routing"
 
 	"github.com/aws/aws-lambda-go/lambda"
@@ -10,7 +11,9 @@ import (
 
 func main() {
 	r := chi.NewRouter()
-	routing.GeneralRoutes(r)
+	r.Route(cfg.Cfg().BasePath, func(r chi.Router) {
+		routing.GeneralRoutes(r)
+	})
 
 	adapter := chiadapter.New(r)
 	lambda.Start(adapter.ProxyWithContext)
