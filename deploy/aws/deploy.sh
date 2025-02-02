@@ -5,6 +5,9 @@
 # It is expected that this script is executing in a compiled deployer 
 # With all required parts in their correct locations in the deployer
 
+set -e
+set -x
+
 APPLICATION_NAME=$1
 ENVIRONMENT_NAME=$2
 DEPLOYMENT_REGION=$3
@@ -14,9 +17,6 @@ STATE_TABLE=$6
 export AWS_ACCESS_KEY_ID=$7
 export AWS_SECRET_ACCESS_KEY=$8
 RELEASES_PATH=$9
-
-set -e
-set -x
 
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
