@@ -5,16 +5,16 @@
 # It is expected that this script is executing in a compiled deployer 
 # With all required parts in their correct locations in the deployer
 
-# Expects the following environment variables exported in the environment
-# APPLIACTION_NAME
-# ENVIRONMENT_NAME
-# DEPLOYMENT_REGION
-# STATE_REGION
-# STATE_BUCKET
-# STATE_TABLE
-# AWS_ACCESS_KEY_ID
-# AWS_SECRET_ACCESS_KEY
-# RELEASES_PATH
+APPLICATION_NAME=$1
+ENVIRONMENT_NAME=$2
+DEPLOYMENT_REGION=$3
+STATE_REGION=$4
+STATE_BUCKET=$5
+STATE_TABLE=$6
+export AWS_ACCESS_KEY_ID=$7
+export AWS_SECRET_ACCESS_KEY=$8
+RELEASES_PATH=$9
+
 set -e
 set -x
 
@@ -28,7 +28,7 @@ terraform init \
     -backend-config="key=terraform/$APPLICATION_NAME/$ENVIRONMENT_NAME/$ENVIRONMENT_NAME" \
     -backend-config="region=$STATE_REGION"
 
-export TF_VAR_application_name="$APPLIACTION_NAME"
+export TF_VAR_application_name="$APPLICATION_NAME"
 export TF_VAR_environment_name="$ENVIRONMENT_NAME"
 export TF_VAR_deployment_region="$DEPLOYMENT_REGION"
 export TF_VAR_releases_path="$RELEASES_PATH"
