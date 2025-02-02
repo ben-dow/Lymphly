@@ -1,0 +1,55 @@
+name: Build
+run-name: build ${{ github.ref_name }}
+on:
+  push:
+    branches:
+      - main
+      - dev
+  workflow_dispatch:
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+      - name: Build
+        run: make build
+      - name: Archive production artifacts
+        uses: actions/upload-artifact@v4
+        with:
+         name: releases
+         path: .build/releases
+  deployment:
+    name: Deploy
+    needs: build
+    runs-on: ubuntu-latest
+    environment: |-
+      ${{
+         github.ref_name == 'main' && 'production'
+      || github.ref_name == 'dev'  && 'dev'
+      }}
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      APPLICATION_NAME: ${{ vars.APPLICATION_NAME }}
+      DEPLOYMENT_REGION: ${{ vars.DEPLOYMENT_REGION }}
+      ENVIRONMENT_NAME: ${{ vars.ENVIRONMENT_NAME }}
+      STATE_BUCKET: ${{ vars.STATE_BUCKET }}
+      STATE_REGION: ${{ vars.STATE_REGION }}
+      STATE_TABLE: ${{ vars.STATE_TABLE }}
+    defaults:
+      run:
+          working-directory: terraform
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.10.4"
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
+
