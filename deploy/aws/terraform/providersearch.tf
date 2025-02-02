@@ -36,3 +36,11 @@ resource "aws_apigatewayv2_route" "providersearch" {
   route_key = "ANY /api/v1/providersearch/{proxy+}"
   target = "integrations/${aws_apigatewayv2_integration.providersearch_integration.id}"
 }
+
+resource "aws_lambda_permission" "providersearch_invoke" {
+  statement_id = "AllowExecutionFromAPIGateway"
+  action = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.providersearch_lambda.function_name
+  principal = "apigateway.amazonaws.com"
+  source_arn = "${aws_apigatewayv2_api.api.execution_arn}/*/*" 
+}
