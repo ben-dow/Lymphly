@@ -11,7 +11,7 @@ prep:
 	mkdir -p ${BUILD_DIR} ${RELEASE_DIR}
 
 build/lambda:
-	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -tags lambda.norpc -o ${RELEASE_DIR}/bootstrap ${ROOT_DIR}/cmd/lambda/main.go
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -tags lambda.norpc -o ${RELEASE_DIR}/bootstrap -ldflags "-s -w" ${ROOT_DIR}/cmd/lambda/main.go
 	cd ${RELEASE_DIR}; \
 	zip ${APPLICATION_NAME}_lambda_x86_64.zip bootstrap; \
 	rm bootstrap
