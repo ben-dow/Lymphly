@@ -21,4 +21,5 @@ resource "aws_lambda_function" "providersearch_lambda" {
     runtime = "provided.al2023"
     handler = "bootstrap"
     architectures = [ "x86_64" ]
+    source_code_hash = filemd5("${var.releases_path}/ProviderSearch_lambda_x86_64.zip")
 }
