@@ -11,7 +11,6 @@ resource "aws_dynamodb_table" "lymphly-table" {
       name = "sk"
       type = "S"
     }
-
     
     hash_key = "pk"
     range_key = "sk"
