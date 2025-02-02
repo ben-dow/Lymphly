@@ -10,7 +10,7 @@ import (
 
 func main() {
 	r := chi.NewRouter()
-	r.Route("/api/v1/providerupdate", func(r chi.Router) {
+	r.Route("/api/v1/providersearch", func(r chi.Router) {
 		r.Get("/health", routes.Health)
 	})
 
