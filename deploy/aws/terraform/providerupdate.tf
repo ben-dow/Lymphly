@@ -1,6 +1,6 @@
 resource "aws_lambda_function" "providerupdate_lambda" {
     filename = "${var.releases_path}/providerupdate_lambda_x86_64.zip"
-    function_name = "provider_search"
+    function_name = "provider_update"
     role = aws_iam_role.provider_search_role.arn
     runtime = "provided.al2023"
     handler = "bootstrap"
