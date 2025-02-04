@@ -17,6 +17,8 @@ set -x
 
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
+unzip $RELEASES_PATH/frontend.zip
+
 pushd $SCRIPT_DIR/terraform
 
 terraform init \
@@ -29,6 +31,7 @@ export TF_VAR_application_name="$APPLICATION_NAME"
 export TF_VAR_environment_name="$ENVIRONMENT_NAME"
 export TF_VAR_deployment_region="$DEPLOYMENT_REGION"
 export TF_VAR_releases_path="$RELEASES_PATH"
+export TF_VAR_website_build_location="$RELEASES_PATH/dist"
 
 terraform apply -auto-approve
 
