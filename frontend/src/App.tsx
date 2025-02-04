@@ -1,13 +1,10 @@
-import { AppShell, Burger, Group, UnstyledButton } from '@mantine/core';
-import { useDisclosure } from '@mantine/hooks';
+import { AppShell} from '@mantine/core';
 import Header from './components/structure/header';
 import Body from './components/structure/body';
 import Footer from './components/structure/footer';
 import "./App.css"
 
 export default function App() {
-  const [opened, { toggle }] = useDisclosure();
-
   return (
     <AppShell
       header={{ height: 100 }}
