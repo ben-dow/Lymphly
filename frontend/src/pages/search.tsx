@@ -16,7 +16,7 @@ function SearchContainer(){
                 <Text size="xl" fw={700}>Find A Provider By:</Text>
             </Box>
 
-            <Box className='flex flex-row flex-wrap md:justify-between gap-5'>
+            <Box className='flex flex-row flex-wrap justify-center gap-5'>
                 <Box className='rounded-xl h-36 w-36 bg-emerald-800 flex flex-col justify-center text-center shadow-sm hover:shadow-xl hover:cursor-pointer'>
                     <Text c="white" fw={700} size={"lg"}>Current Location</Text>
                 </Box>
