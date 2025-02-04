@@ -25,7 +25,7 @@ build/lambda/providerupdate: build_dir
 
 build/frontend: build_dir
 	cd frontend; \
-	npm build; \
+	npm run build; \
 	zip -r dist.zip dist/; \
 	mv dist.zip ${RELEASE_DIR}/frontend.zip
 
