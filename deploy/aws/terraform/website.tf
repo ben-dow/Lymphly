@@ -11,16 +11,6 @@ resource "aws_s3_bucket_public_access_block" "static_site_bucket_public_access" 
   restrict_public_buckets = true
 }
 
-resource "aws_s3_bucket_cors_configuration" "website_cors" {
-  bucket = aws_s3_bucket.website_bucket.bucket
-  cors_rule {
-    allowed_headers = ["*"]
-    allowed_methods = ["GET"]
-    allowed_origins = ["*"]
-    max_age_seconds = 3000
-  }
-}
-
 resource "aws_s3_bucket_policy" "bucket-policy" {
   bucket = aws_s3_bucket.website_bucket.id
   policy = data.aws_iam_policy_document.s3_bucket_policy.json
@@ -53,7 +43,7 @@ resource "aws_s3_bucket_website_configuration" "website" {
 }
 
 resource "aws_s3_object" "dist" {
-  for_each = fileset("${var.website_build_location}/", "**/*.*")
+  for_each = fileset("${var.website_build_location}", "**/*.*")
   bucket = aws_s3_bucket.website_bucket.id
   key = each.value
   source = "${var.website_build_location}/${each.value}"
