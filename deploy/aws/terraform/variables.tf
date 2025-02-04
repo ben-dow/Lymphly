@@ -13,3 +13,7 @@ variable "deployment_region" {
 variable "releases_path" {
   type=string
 }
+
+variable "website_build_location"{
+  type=string
+}
