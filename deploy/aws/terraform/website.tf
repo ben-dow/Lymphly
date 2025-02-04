@@ -11,6 +11,16 @@ resource "aws_s3_bucket_public_access_block" "static_site_bucket_public_access" 
   restrict_public_buckets = true
 }
 
+resource "aws_s3_bucket_cors_configuration" "website_cors" {
+  bucket = aws_s3_bucket.website_bucket.bucket
+  cors_rule {
+    allowed_headers = ["*"]
+    allowed_methods = ["GET"]
+    allowed_origins = ["*"]
+    max_age_seconds = 3000
+  }
+}
+
 resource "aws_s3_bucket_policy" "bucket-policy" {
   bucket = aws_s3_bucket.website_bucket.id
   policy = data.aws_iam_policy_document.s3_bucket_policy.json
@@ -61,7 +71,6 @@ resource "aws_s3_object" "dist" {
   }, split(".", each.value)[length(split(".", each.value)) - 1], "application/octet-stream")
 }
 
-
 resource "aws_cloudfront_origin_access_control" "cf-s3-oac" {
   name                              = "${var.application_name} ${var.environment_name} CF S3 OAC"
   description                       = "CloudFront S3 OAC"
@@ -69,8 +78,6 @@ resource "aws_cloudfront_origin_access_control" "cf-s3-oac" {
   signing_behavior                  = "always"
   signing_protocol                  = "sigv4"
 }
-
-
 
 resource "aws_cloudfront_distribution" "website" {
   enabled = true
