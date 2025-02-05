@@ -16,20 +16,10 @@ export default function Search(){
 
 function SearchContainer(){
 
-    useEffect(() => {
-        fetch("/radar_pub_key.txt").then((r) =>r.text()).then(text=>{
-            Radar.initialize(text);
-            Radar.ui.map({
-                container: "map",
-                center: [-98.5556199, 39.8097343],
-                zoom: 2,
-            })
-        })
 
-      }, []);
 
     return(
-        <Box className={"bg-emerald-100 p-5 flex flex-col gap-10 shadow-sm max-w-7xl p-10 rounded-xl"}>
+        <Box className={"bg-emerald-100 p-5 flex flex-col gap-10 shadow-sm w-full xl:w-1/2 p-10 rounded-xl"}>
             <Box className="text-center">
                 <Text size="xl" fw={700}>Find A Provider By:</Text>
             </Box>
@@ -51,21 +41,52 @@ function SearchContainer(){
                     <Text c="white" fw={700} size={"lg"}>Practice</Text>
                 </Box>
             </Box>
+            
+            <Box className="text-center">
+                <Text size="xl" fw={700}>Or View All Providers</Text>
+            </Box>
 
-            <Box>
-                
+            <Box>                
             <Tabs defaultValue={"Map"} className="w-full h-96 shadow-sm  rounded-2xl">
                 <Tabs.List>
                     <Tabs.Tab value="Map">Map</Tabs.Tab>
+                    <Tabs.Tab value="Providers">Providers</Tabs.Tab>
+                    <Tabs.Tab value="Practices">Practices</Tabs.Tab>
                 </Tabs.List>
                 <Tabs.Panel value="Map" className='h-full'>
-                    <Box className='w-full h-full'>
-                        <div id="map" className="w-full h-87 rounded-2xl"/>
-                    </Box>                
+                    <Map/>
+                </Tabs.Panel>
+                <Tabs.Panel value="Providers" className='h-full'>
+                    <Map/>
+                </Tabs.Panel>
+                <Tabs.Panel value="Practices" className='h-full'>
+                    <Map/>
                 </Tabs.Panel>
             </Tabs>
             </Box>
 
         </Box>            
     )
+}
+
+
+function Map(){
+    useEffect(() => {
+        fetch("/radar_pub_key.txt").then((r) =>r.text()).then(text=>{
+            Radar.initialize(text);
+            Radar.ui.map({
+                container: "map",
+                center: [-98.5556199, 39.8097343],
+                zoom: 2,
+            })
+        })
+
+      }, []);
+
+      return(
+        <Box className='w-full h-full'>
+            <div id="map" className="w-full h-87 rounded-2xl"/>
+        </Box>        
+      )
+
 }
