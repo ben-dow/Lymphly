@@ -11,6 +11,7 @@
 # export AWS_ACCESS_KEY_ID=$7
 # export AWS_SECRET_ACCESS_KEY=$8
 # RELEASES_PATH=$9
+# RADAR_PUBLIC_KEY
 
 set -e
 set -x
@@ -19,6 +20,7 @@ SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 pushd $RELEASES_PATH
 unzip frontend.zip
+echo "$RADAR_PUBLIC_KEY" > dist/radar_pub_key.txt
 popd
 
 pushd $SCRIPT_DIR/terraform

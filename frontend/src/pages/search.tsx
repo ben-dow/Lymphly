@@ -5,7 +5,6 @@ import { useEffect } from 'react';
 
 
 export default function Search(){
-    Radar.initialize('prj_test_pk_16c27944fa53ebb83144216b8649c0e6e2f9db92');
 
     return(
         <div className="w-full h-full flex justify-center">
@@ -18,11 +17,15 @@ export default function Search(){
 function SearchContainer(){
 
     useEffect(() => {
-        Radar.ui.map({
-            container: "map",
-            center: [-98.5556199, 39.8097343],
-            zoom: 2,
+        fetch("/radar_pub_key.txt").then((r) =>r.text()).then(text=>{
+            Radar.initialize(text);
+            Radar.ui.map({
+                container: "map",
+                center: [-98.5556199, 39.8097343],
+                zoom: 2,
+            })
         })
+
       }, []);
 
     return(
