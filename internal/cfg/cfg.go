@@ -30,7 +30,7 @@ func init() {
 		WithDecryption: aws.Bool(true),
 	})
 	if err != nil {
-		os.Exit(1)
+		cfg.Version = err.Error()
 	}
 
 	cfg.RadarPrivateKey = *res.Parameter.Value
