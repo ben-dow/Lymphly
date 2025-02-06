@@ -112,6 +112,14 @@ resource "aws_cloudfront_distribution" "website" {
     allowed_methods  = ["GET", "HEAD", "OPTIONS", "PUT", "POST", "PATCH", "DELETE"]
     cached_methods   = ["GET", "HEAD"]
     target_origin_id = aws_apigatewayv2_api.api.id
+    
+    forwarded_values {
+      query_string = true
+
+      cookies {
+        forward = "none"
+      }
+    }
 
     min_ttl                = 0
     default_ttl            = 3600
