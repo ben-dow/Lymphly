@@ -4,7 +4,7 @@ locals {
 
 resource "aws_lambda_function" "providerupdate_lambda" {
     filename = "${var.releases_path}/providerupdate_lambda_x86_64.zip"
-    function_name = "provider_update"
+    function_name = "${var.application_name}_${var.environment_name}provider_update"
     role = aws_iam_role.lambda_execute_role.arn
     runtime = "provided.al2023"
     handler = "bootstrap"

@@ -4,7 +4,7 @@ locals {
 
 resource "aws_lambda_function" "providersearch_lambda" {
     filename = "${var.releases_path}/providersearch_lambda_x86_64.zip"
-    function_name = "provider_search"
+    function_name = "${var.application_name}_${var.environment_name}_provider_search"
     role = aws_iam_role.lambda_execute_role.arn
     runtime = "provided.al2023"
     handler = "bootstrap"
