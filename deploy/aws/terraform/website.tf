@@ -80,6 +80,11 @@ resource "aws_cloudfront_distribution" "website" {
     origin_access_control_id = aws_cloudfront_origin_access_control.cf-s3-oac.id
   }
 
+  origin {
+    domain_name = aws_apigatewayv2_api.api.api_endpoint
+    origin_id = aws_apigatewayv2_api.api.id 
+  }
+
 
   default_cache_behavior {
     allowed_methods = ["GET", "HEAD"]
