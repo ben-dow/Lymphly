@@ -12,7 +12,10 @@ resource "aws_lambda_function" "providerupdate_lambda" {
     source_code_hash = filemd5("${var.releases_path}/providerupdate_lambda_x86_64.zip")
     environment {
       variables = {
-        BASE_PATH = local.providerupdate_basepath
+        BASE_PATH = local.providersearch_basepath
+        APP_NAME = var.application_name
+        ENV_NAME = var.environment_name
+        REGION = var.deployment_region        
       }
     }
 }

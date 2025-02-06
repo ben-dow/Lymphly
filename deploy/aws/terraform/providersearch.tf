@@ -13,6 +13,9 @@ resource "aws_lambda_function" "providersearch_lambda" {
     environment {
       variables = {
         BASE_PATH = local.providersearch_basepath
+        APP_NAME = var.application_name
+        ENV_NAME = var.environment_name
+        REGION = var.deployment_region
       }
     }
 }
