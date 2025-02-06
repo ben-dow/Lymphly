@@ -91,7 +91,6 @@ resource "aws_cloudfront_distribution" "website" {
     }
   }
 
-
   default_cache_behavior {
     allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
     cached_methods   = ["GET", "HEAD"]
@@ -108,6 +107,40 @@ resource "aws_cloudfront_distribution" "website" {
       }
     }
   }
+  ordered_cache_behavior {
+    path_pattern     = "/api/*"
+    allowed_methods  = ["GET", "HEAD", "OPTIONS", "PUT", "POST", "PATCH", "DELETE"]
+    cached_methods   = ["GET", "HEAD"]
+    target_origin_id = aws_apigatewayv2_api.api.id
+
+    min_ttl                = 0
+    default_ttl            = 3600
+    max_ttl                = 86400
+    compress               = true
+    viewer_protocol_policy = "allow-all"
+  }
+
+  ordered_cache_behavior {
+    path_pattern     = "/*"
+    allowed_methods  = ["GET", "HEAD", "OPTIONS"]
+    cached_methods   = ["GET", "HEAD"]
+    target_origin_id = aws_s3_bucket.website_bucket.id
+
+    forwarded_values {
+      query_string = false
+
+      cookies {
+        forward = "none"
+      }
+    }
+
+    min_ttl                = 0
+    default_ttl            = 3600
+    max_ttl                = 86400
+    compress               = true
+    viewer_protocol_policy = "allow-all"
+  }
+
   restrictions {
     geo_restriction {
       restriction_type = "none"
