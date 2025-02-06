@@ -12,6 +12,7 @@
 # export AWS_SECRET_ACCESS_KEY=$8
 # RELEASES_PATH=$9
 # RADAR_PUBLIC_KEY
+# RADAR_SECRET_KEY
 
 set -e
 set -x
@@ -36,6 +37,7 @@ export TF_VAR_environment_name="$ENVIRONMENT_NAME"
 export TF_VAR_deployment_region="$DEPLOYMENT_REGION"
 export TF_VAR_releases_path="$RELEASES_PATH"
 export TF_VAR_website_build_location="$RELEASES_PATH/dist/"
+export TF_VAR_radar_secret_key="$RADAR_SECRET_KEY"
 
 terraform apply -auto-approve
 

@@ -17,3 +17,8 @@ variable "releases_path" {
 variable "website_build_location"{
   type=string
 }
+
+
+variable "radar_secret_key"{
+  type=string
+}

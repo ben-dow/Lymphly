@@ -49,6 +49,7 @@ jobs:
       STATE_TABLE: ${{ vars.STATE_TABLE }}
       RELEASES_PATH: ${{ github.workspace }}/releases
       RADAR_PUBLIC_KEY: ${{ secrets.RADAR_PUBLISHABLE_API_KEY }}
+      RADAR_SECRET_KEY: ${{ secrets.RADAR_SECRET_API_KEY }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
