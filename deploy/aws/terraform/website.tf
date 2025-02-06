@@ -81,7 +81,7 @@ resource "aws_cloudfront_distribution" "website" {
   }
 
   origin {
-    domain_name = aws_apigatewayv2_api.api.api_endpoint
+    domain_name = "${aws_apigatewayv2_api.api.id}.execute-api.${var.deployment_region}.amazonaws.com"
     origin_id = aws_apigatewayv2_api.api.id
     custom_origin_config {
       http_port              = "80"
