@@ -31,9 +31,9 @@ func init() {
 	})
 	if err != nil {
 		cfg.Version = err.Error()
+	} else {
+		cfg.RadarPrivateKey = *res.Parameter.Value
 	}
-
-	cfg.RadarPrivateKey = *res.Parameter.Value
 
 	defaultCfg = cfg
 }
