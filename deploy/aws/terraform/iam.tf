@@ -28,6 +28,13 @@ data "aws_iam_policy_document" "lambda_execute_policy" {
     statement {
         effect = "Allow"
         actions = ["ssm:GetParameter"]
-        resources = [ aws_ssm_parameter.radarSecret.arn ]
-  }
+        resources = [ "arn:aws:ssm:${var.deployment_region}:${data.aws_caller_identity.current.account_id}:${var.application_name}/${var.environment_name}/*"  ]
+    }
+    statement {
+        effect = "Allow"
+        actions = ["ssm:DescribeParmeters"]
+        resources = ["*"]
+    }
 }
+
+data "aws_caller_identity" "current" {}
