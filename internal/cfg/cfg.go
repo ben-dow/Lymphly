@@ -26,7 +26,7 @@ func init() {
 	}
 
 	res, err := ssmClient.GetParameter(context.Background(), &ssm.GetParameterInput{
-		Name:           aws.String(fmt.Sprintf("%s/%s/key/radar/private", cfg.AppName, cfg.Environment)),
+		Name:           aws.String(fmt.Sprintf("/%s/%s/key/radar/private", cfg.AppName, cfg.Environment)),
 		WithDecryption: aws.Bool(true),
 	})
 	if err != nil {
