@@ -30,6 +30,22 @@ data "aws_iam_policy_document" "lambda_execute_policy" {
         actions = ["ssm:GetParameter", "ssm:GetParametersByPath"]
         resources = [ aws_ssm_parameter.radarSecret.arn  ]
     }
+    statement {
+        effect = "Allow"
+        actions = [
+                "dynamodb:BatchGetItem",
+                "dynamodb:BatchWriteItem",
+                "dynamodb:ConditionCheckItem",
+                "dynamodb:PutItem",
+                "dynamodb:DescribeTable",
+                "dynamodb:DeleteItem",
+                "dynamodb:GetItem",
+                "dynamodb:Scan",
+                "dynamodb:Query",
+                "dynamodb:UpdateItem"
+                ]
+        resources = [ aws_dynamodb_table.lymphly-table.arn  ]
+    }
 }
 
 data "aws_caller_identity" "current" {}

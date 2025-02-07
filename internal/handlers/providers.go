@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"lymphly/internal/data"
 	"net/http"
 
 	"golang.org/x/crypto/sha3"
@@ -37,12 +38,31 @@ func PutNewProvider(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Hasher for Determing Ids
+	h := sha3.New512()
+
 	// Determine Pratice Id
 	practice := fmt.Sprintf("%s-%s", requestBody.Practice, requestBody.FullAddress)
-	h := sha3.New512()
 	h.Write([]byte(practice))
-	id := base64.URLEncoding.EncodeToString(h.Sum(nil))
+	practiceId := base64.URLEncoding.EncodeToString(h.Sum(nil))
 
-	w.Write([]byte(id))
+	// Reset Hasher
+	h.Reset()
 
+	// Determine Provider Id
+	//provider := fmt.Sprintf("%s-%s", requestBody.Name, practiceId)
+	//h.Write([]byte(provider))
+	//providerId := base64.URLEncoding.EncodeToString(h.Sum(nil))
+
+	// Save Practice
+	err = data.PutPractice(r.Context(), practiceId, requestBody.Practice, requestBody.FullAddress, requestBody.Phone, requestBody.Website, requestBody.PracticeTags)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	// Save Provider
+	//data.PutProvider(providerId, requestBody.Name, requestBody.ProviderTags, practiceId)
+
+	w.WriteHeader(http.StatusOK)
 }

@@ -1,8 +1,8 @@
 package data
 
 type PrimaryKey struct {
-	PartitionKey string
-	SortKey      string
+	PartitionKey string `dynamodbav:"pk"`
+	SortKey      string `dynamodbav:"sk"`
 }
 
 const (
