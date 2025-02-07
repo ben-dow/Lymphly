@@ -12,7 +12,7 @@ require (
 	github.com/awslabs/aws-lambda-go-api-proxy v0.16.2
 	github.com/caarlos0/env/v11 v11.3.1
 	github.com/go-chi/chi/v5 v5.2.1
-	github.com/google/uuid v1.5.0
+	golang.org/x/crypto v0.18.0
 )
 
 require (
@@ -28,4 +28,5 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.28.14 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sts v1.33.14 // indirect
 	github.com/aws/smithy-go v1.22.2 // indirect
+	golang.org/x/sys v0.16.0 // indirect
 )
