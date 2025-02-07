@@ -16,6 +16,7 @@ resource "aws_lambda_function" "providerupdate_lambda" {
         APP_NAME = var.application_name
         ENV_NAME = var.environment_name
         REGION = var.deployment_region        
+        TABLE_NAME = aws_dynamodb_table.lymphly-table.name
       }
     }
 }
