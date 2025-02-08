@@ -93,7 +93,9 @@ func PutPractice(ctx context.Context, id, name, address, phone, website, tags st
 				PartitionKey: fmt.Sprintf("%s%s", PracticeGeoHashPkPrefix, practice.GeoHash),
 				SortKey:      practice.PracticeId,
 			},
-			Practice: practice,
+			Lattitude:  practice.Lattitude,
+			Longitude:  practice.Longitude,
+			PracticeId: practice.PracticeId,
 		}
 		marshaledRecord, _ := attributevalue.MarshalMap(practiceRecord)
 		_, err = db.PutItem(ctx, &dynamodb.PutItemInput{

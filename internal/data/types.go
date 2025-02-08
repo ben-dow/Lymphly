@@ -52,7 +52,9 @@ const (
 
 type PracticeGeoHashRecord struct {
 	PrimaryKey
-	Practice
+	Lattitude  float64
+	Longitude  float64
+	PracticeId string
 }
 
 type ProviderGeoHashRecord struct {
