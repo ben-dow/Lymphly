@@ -125,7 +125,7 @@ resource "aws_cloudfront_distribution" "website" {
     default_ttl            = 3600
     max_ttl                = 86400
     compress               = true
-    viewer_protocol_policy = "allow-all"
+    viewer_protocol_policy = "redirect-to-https"
   }
 
   ordered_cache_behavior {
@@ -146,8 +146,15 @@ resource "aws_cloudfront_distribution" "website" {
     default_ttl            = 3600
     max_ttl                = 86400
     compress               = true
-    viewer_protocol_policy = "allow-all"
+    viewer_protocol_policy = "redirect-to-https"
   }
+
+  custom_error_response {
+      error_caching_min_ttl = 0
+      error_code            = 404
+      response_code         = 200
+      response_page_path    = "/index.html"
+    }
 
   restrictions {
     geo_restriction {
