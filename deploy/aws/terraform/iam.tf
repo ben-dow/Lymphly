@@ -18,7 +18,7 @@ resource "aws_iam_role" "lambda_execute_role" {
   assume_role_policy = data.aws_iam_policy_document.lambda_execute_assume_policy.json
 }
 
-resource "aws_iam_role_policy_attachment" "lambda_execute_attach" {
+resource "aws_iam_role_policy_attachment" "lambda_basic_execution_attach" {
   policy_arn = aws_iam_policy.lambda_execution_policy.arn
   role = aws_iam_role.lambda_execute_role.name
 }
