@@ -12,8 +12,8 @@ const (
 type Provider struct {
 	ProviderId string
 	Name       string
-	Type       string
 	PracticeId string
+	Tags       []string
 }
 
 type ProviderRecord struct {
@@ -38,6 +38,7 @@ type Practice struct {
 	StateCode   string
 	Country     string
 	CountryCode string
+	Tags        []string
 }
 
 type PracticeRecord struct {
@@ -52,9 +53,7 @@ const (
 
 type PracticeGeoHashRecord struct {
 	PrimaryKey
-	Lattitude  float64
-	Longitude  float64
-	PracticeId string
+	Practice
 }
 
 type ProviderGeoHashRecord struct {

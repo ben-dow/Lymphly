@@ -50,25 +50,23 @@ func PutNewProvider(w http.ResponseWriter, r *http.Request) {
 	h.Reset()
 
 	// Determine Provider Id
-	//provider := fmt.Sprintf("%s-%s", requestBody.Name, practiceId)
-	//h.Write([]byte(provider))
-	//providerId := base64.URLEncoding.EncodeToString(h.Sum(nil))
+	provider := fmt.Sprintf("%s-%s", requestBody.Name, practiceId)
+	h.Write([]byte(provider))
+	providerId := base64.URLEncoding.EncodeToString(h.Sum(nil))
 
 	// Save Practice
-	_, err = data.PutPractice(r.Context(), practiceId, requestBody.Practice, requestBody.FullAddress, requestBody.Phone, requestBody.Website, requestBody.PracticeTags)
+	savedPractice, err := data.PutPractice(r.Context(), practiceId, requestBody.Practice, requestBody.FullAddress, requestBody.Phone, requestBody.Website, requestBody.PracticeTags)
 	if err != nil {
-		out := map[string]string{
-			"error": err.Error(),
-		}
-		outBytes, _ := json.Marshal(out)
-		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write(outBytes)
 		return
 	}
 
 	// Save Provider
-	//data.PutProvider(providerId, requestBody.Name, requestBody.ProviderTags, practiceId)
+	_, err = data.PutProvider(r.Context(), providerId, requestBody.Name, requestBody.ProviderTags, savedPractice)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 
 	w.WriteHeader(http.StatusOK)
 }
