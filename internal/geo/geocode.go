@@ -16,11 +16,11 @@ type MetaResponse struct {
 }
 
 type AddressResponse struct {
-	Latitude  float32 `json:"latitude"`
-	Longitude float32 `json:"longitude"`
+	Latitude  float64 `json:"latitude"`
+	Longitude float64 `json:"longitude"`
 	Geometry  struct {
 		Type        string    `json:"type"`
-		Coordinates []float32 `json:"coordinates"`
+		Coordinates []float64 `json:"coordinates"`
 	} `json:"geometry"`
 	Country          string `json:"country"`
 	CountryCode      string `json:"countryCode"`

@@ -9,6 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/aws/aws-sdk-go-v2/service/location"
+	"github.com/mmcloughlin/geohash"
 )
 
 var db *dynamodb.Client
@@ -56,7 +57,7 @@ func PutPractice(ctx context.Context, id, name, address, phone, website, tags st
 		FullAddress: address,
 		Lattitude:   resp.Addresses[0].Latitude,
 		Longitude:   resp.Addresses[0].Longitude,
-		GeoHash:     "",
+		GeoHash:     geohash.EncodeWithPrecision(resp.Addresses[0].Latitude, resp.Addresses[0].Longitude, 4),
 		Phone:       phone,
 		Website:     website,
 	}

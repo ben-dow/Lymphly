@@ -26,8 +26,8 @@ type PracticeRecord struct {
 	PracticeId  string
 	Name        string
 	FullAddress string
-	Lattitude   float32
-	Longitude   float32
+	Lattitude   float64
+	Longitude   float64
 	GeoHash     string
 	Phone       string
 	Website     string
