@@ -100,7 +100,7 @@ function Map(props:MapProps){
             const Map = Radar.ui.map({
                 container: "map",
                 center: [-98.5556199, 39.8097343],
-                zoom: 2,
+                zoom: 1,
             })
             setMap(Map)
         })
@@ -113,8 +113,7 @@ function Map(props:MapProps){
                 const element = props.Practices[index];
                 Radar.ui.marker({
                     color: '#000257',
-                    width: 1,
-                    height: 2,
+                    scale: .5,
                 }).setLngLat([element.Long, element.Lat]).addTo(map)
             }
         }
