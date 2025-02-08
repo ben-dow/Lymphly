@@ -9,6 +9,10 @@ data "aws_iam_policy_document" "lambda_execute_assume_policy" {
   }
 }
 
+data "aws_iam_policy" "basicExecution" {
+  name = "AWSLambdaBasicExecutionRole"
+}
+
 resource "aws_iam_role" "lambda_execute_role" {
   name = "${var.application_name}-${var.environment_name}-lambda-role"
   assume_role_policy = data.aws_iam_policy_document.lambda_execute_assume_policy.json
@@ -16,6 +20,11 @@ resource "aws_iam_role" "lambda_execute_role" {
 
 resource "aws_iam_role_policy_attachment" "lambda_execute_attach" {
   policy_arn = aws_iam_policy.lambda_execution_policy.arn
+  role = aws_iam_role.lambda_execute_role.name
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_execute_attach" {
+  policy_arn = data.aws_iam_policy.basicExecution.arn
   role = aws_iam_role.lambda_execute_role.name
 }
 
