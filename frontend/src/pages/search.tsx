@@ -1,7 +1,7 @@
 import {Box, Tabs, Text} from '@mantine/core'
 import Radar from 'radar-sdk-js';
 import 'radar-sdk-js/dist/radar.css'
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 
 export default function Search(){
@@ -13,9 +13,24 @@ export default function Search(){
     )
 }
 
+interface Practice {
+    PracticeId: String
+    Name: String
+    Lat: number
+    Long: number
+}
+
 
 function SearchContainer(){
 
+    const [practices, setPractices] = useState<Practice[]>([])
+
+    useEffect(() => {
+        fetch("/radar_pub_key.txt").then((r) =>r.json()).then(j=>{
+            const ps: [] = j["Practices"]
+            setPractices(ps as Practice[])
+        })
+    }, [])
 
 
     return(
@@ -54,13 +69,13 @@ function SearchContainer(){
                     <Tabs.Tab value="Practices">Practices</Tabs.Tab>
                 </Tabs.List>
                 <Tabs.Panel value="Map" className='h-full'>
-                    <Map/>
+                    <Map Practices={practices}/>
                 </Tabs.Panel>
                 <Tabs.Panel value="Providers" className='h-full'>
-                    <Map/>
+                    Providers
                 </Tabs.Panel>
                 <Tabs.Panel value="Practices" className='h-full'>
-                    <Map/>
+                    Practices
                 </Tabs.Panel>
             </Tabs>
             </Box>
@@ -70,19 +85,31 @@ function SearchContainer(){
 }
 
 
-function Map(){
+
+interface MapProps {
+    Practices: Practice[]
+}
+
+function Map(props:MapProps){
     useEffect(() => {
         fetch("/radar_pub_key.txt").then((r) =>r.text()).then(text=>{
             Radar.initialize(text);
-            Radar.ui.map({
+            const Map = Radar.ui.map({
                 container: "map",
                 center: [-98.5556199, 39.8097343],
                 zoom: 2,
             })
+            
+            for (let index = 0; index < props.Practices.length; index++) {
+                const element = props.Practices[index];
+                
+                Radar.ui.marker({
+                    color: '#000257',
+                    width: 10,
+                    height: 20,
+                }).setLngLat([element.Long, element.Lat]).addTo(Map)
+            }
         })
-
-        
-
       }, []);
 
       return(
