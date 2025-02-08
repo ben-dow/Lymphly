@@ -109,6 +109,8 @@ function Map(props:MapProps){
                     height: 20,
                 }).setLngLat([element.Long, element.Lat]).addTo(Map)
             }
+
+            Map.redraw()
         })
       }, []);
 
