@@ -57,7 +57,11 @@ func PutPractice(ctx context.Context, id, name, address, phone, website, tags st
 	practice := Practice{
 		PracticeId:  id,
 		Name:        name,
-		FullAddress: address,
+		State:       resp.Addresses[0].State,
+		StateCode:   resp.Addresses[0].StateCode,
+		Country:     resp.Addresses[0].Country,
+		CountryCode: resp.Addresses[0].CountryCode,
+		FullAddress: resp.Addresses[0].FormattedAddress,
 		Lattitude:   resp.Addresses[0].Latitude,
 		Longitude:   resp.Addresses[0].Longitude,
 		GeoHash:     geohash.EncodeWithPrecision(resp.Addresses[0].Latitude, resp.Addresses[0].Longitude, 4),

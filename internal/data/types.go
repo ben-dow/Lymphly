@@ -34,6 +34,10 @@ type Practice struct {
 	GeoHash     string
 	Phone       string
 	Website     string
+	State       string
+	StateCode   string
+	Country     string
+	CountryCode string
 }
 
 type PracticeRecord struct {
