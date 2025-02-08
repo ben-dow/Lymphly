@@ -70,7 +70,7 @@ func GeocodeAddress(addr string) (*GeocodeResponse, error) {
 		return nil, errors.New("request was not successful")
 	}
 
-	respBytes, err := io.ReadAll(req.Body)
+	respBytes, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}
