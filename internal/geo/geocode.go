@@ -12,7 +12,7 @@ import (
 var httpClient = &http.Client{}
 
 type MetaResponse struct {
-	Code string `json:"code"`
+	Code int `json:"code"`
 }
 
 type AddressResponse struct {
