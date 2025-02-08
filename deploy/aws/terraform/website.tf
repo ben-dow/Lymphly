@@ -166,4 +166,5 @@ resource "null_resource" "invalidate_cache"{
   provisioner "local-exec" {
     command = "aws cloudfront create-invalidation --distribution-id ${aws_cloudfront_distribution.website.id} --paths \"/*\""
   }
+  depends_on = [ aws_lambda_function.providersearch_lambda, aws_lambda_function.providerupdate_lambda, aws_s3_object.dist ]
 }
