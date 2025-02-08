@@ -3,6 +3,8 @@ import Radar from 'radar-sdk-js';
 import 'radar-sdk-js/dist/radar.css'
 import RadarMap from 'radar-sdk-js/dist/ui/RadarMap';
 import { useEffect, useState } from 'react';
+import { PracticeList } from '../model/practice';
+import { DataDisplay, Map } from '../components/search/display';
 
 
 export default function Search(){
@@ -14,22 +16,17 @@ export default function Search(){
     )
 }
 
-interface Practice {
-    PracticeId: String
-    Name: String
-    Lat: number
-    Long: number
-}
+
 
 
 function SearchContainer(){
 
-    const [practices, setPractices] = useState<Practice[]>([])
+    const [practices, setPractices] = useState<PracticeList>({practices:[]})
 
     useEffect(() => {
         fetch("/api/v1/providersearch/practices/all").then((r) =>r.json()).then(j=>{
-            const pr: MapProps = j
-            setPractices(pr.Practices)
+            const pl: PracticeList = j
+            setPractices(pl)
         })
     }, [])
 
@@ -61,23 +58,8 @@ function SearchContainer(){
                 <Text size="xl" fw={700}>Or View All Providers</Text>
             </Box>
 
-            <Box>                
-            <Tabs defaultValue={"Map"} className="w-full h-96 shadow-sm  rounded-2xl">
-                <Tabs.List>
-                    <Tabs.Tab value="Map">Map</Tabs.Tab>
-                    <Tabs.Tab value="Providers">Providers</Tabs.Tab>
-                    <Tabs.Tab value="Practices">Practices</Tabs.Tab>
-                </Tabs.List>
-                <Tabs.Panel value="Map" className='h-full'>
-                    <Map Practices={practices}/>
-                </Tabs.Panel>
-                <Tabs.Panel value="Providers" className='h-full'>
-                    Providers
-                </Tabs.Panel>
-                <Tabs.Panel value="Practices" className='h-full'>
-                    Practices
-                </Tabs.Panel>
-            </Tabs>
+            <Box>
+                <DataDisplay practiceList={practices}/>
             </Box>
 
         </Box>            
@@ -86,43 +68,4 @@ function SearchContainer(){
 
 
 
-interface MapProps {
-    Practices: Practice[]
-}
 
-function Map(props:MapProps){
-
-    const [map, setMap] = useState<RadarMap>()
-
-    useEffect(() => {
-        fetch("/radar_pub_key.txt").then((r) =>r.text()).then(text=>{
-            Radar.initialize(text);
-            const Map = Radar.ui.map({
-                container: "map",
-                center: [-98.5556199, 39.8097343],
-                zoom: 1,
-            })
-            setMap(Map)
-        })
-
-    }, [])
-
-    useEffect(() => {
-        if (map != undefined){
-            for (let index = 0; index < props.Practices.length; index++) {
-                const element = props.Practices[index];
-                Radar.ui.marker({
-                    color: '#000257',
-                    scale: .5,
-                }).setLngLat([element.Long, element.Lat]).addTo(map)
-            }
-        }
-      }, [props, map]);
-
-      return(
-        <Box className='w-full h-full'>
-            <div id="map" className="w-full h-87 rounded-2xl"/>
-        </Box>        
-      )
-
-}
