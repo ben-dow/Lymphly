@@ -1,7 +1,5 @@
 import {Box, Tabs, Text} from '@mantine/core'
-import Radar from 'radar-sdk-js';
 import 'radar-sdk-js/dist/radar.css'
-import RadarMap from 'radar-sdk-js/dist/ui/RadarMap';
 import { useEffect, useState } from 'react';
 import { PracticeList } from '../model/practice';
 import { DataDisplay, Map } from '../components/search/display';
