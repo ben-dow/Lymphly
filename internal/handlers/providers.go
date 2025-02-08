@@ -57,6 +57,7 @@ func PutNewProvider(w http.ResponseWriter, r *http.Request) {
 	// Save Practice
 	err = data.PutPractice(r.Context(), practiceId, requestBody.Practice, requestBody.FullAddress, requestBody.Phone, requestBody.Website, requestBody.PracticeTags)
 	if err != nil {
+		w.Write([]byte(err.Error()))
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
