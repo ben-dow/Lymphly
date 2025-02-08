@@ -95,7 +95,6 @@ function Map(props:MapProps){
     const [map, setMap] = useState<RadarMap>()
 
     useEffect(() => {
-
         fetch("/radar_pub_key.txt").then((r) =>r.text()).then(text=>{
             Radar.initialize(text);
             const Map = Radar.ui.map({
@@ -114,8 +113,8 @@ function Map(props:MapProps){
                 const element = props.Practices[index];
                 Radar.ui.marker({
                     color: '#000257',
-                    width: 5,
-                    height: 10,
+                    width: 1,
+                    height: 2,
                 }).setLngLat([element.Long, element.Lat]).addTo(map)
             }
         }
