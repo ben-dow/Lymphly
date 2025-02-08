@@ -1,4 +1,4 @@
-import { Box, Tabs } from "@mantine/core";
+import { Box, Table, Tabs } from "@mantine/core";
 import Radar from "radar-sdk-js";
 import RadarMap from "radar-sdk-js/dist/ui/RadarMap";
 import { useEffect, useState } from "react";
@@ -14,20 +14,36 @@ export function DataDisplay(props:DataDisplayProps) {
             <Tabs defaultValue={"Map"} className="w-full h-96 shadow-sm  rounded-2xl">
                 <Tabs.List>
                     <Tabs.Tab value="Map">Map</Tabs.Tab>
-                    <Tabs.Tab value="Providers">Providers</Tabs.Tab>
                     <Tabs.Tab value="Practices">Practices</Tabs.Tab>
                 </Tabs.List>
                 <Tabs.Panel value="Map" className='h-full'>
                     <Map {...props}/>
                 </Tabs.Panel>
-                <Tabs.Panel value="Providers" className='h-full'>
-                    Providers
-                </Tabs.Panel>
                 <Tabs.Panel value="Practices" className='h-full'>
-                    Practices
+                    <PracticeTable {...props}/>
                 </Tabs.Panel>
             </Tabs>
     )
+}
+
+export function PracticeTable(props: DataDisplayProps){
+    console.log("test")
+
+    return (
+    <Table>
+        <Table.Thead>
+            <Table.Tr>
+                <Table.Th>Name</Table.Th>
+                <Table.Th>Name</Table.Th>
+            </Table.Tr>
+        </Table.Thead>
+        <Table.Tbody>
+            <Table.Tr>
+                <Table.Td>T</Table.Td>
+            </Table.Tr>
+        </Table.Tbody>
+    </Table>)
+
 }
 
 

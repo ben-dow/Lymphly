@@ -51,10 +51,6 @@ function SearchContainer(){
                     <Text c="white" fw={700} size={"lg"}>Practice</Text>
                 </Box>
             </Box>
-            
-            <Box className="text-center">
-                <Text size="xl" fw={700}>Or View All Providers</Text>
-            </Box>
 
             <Box>
                 <DataDisplay practiceList={practices}/>

@@ -1,9 +1,9 @@
 export interface PracticeI {
     practiceId: string
     name: string
-    fullAddress: string
     lattitude: number
     longitude: number
+    fullAddress: string
     geoHash: string
     phone: string
     website: string
