@@ -43,8 +43,8 @@ type AddressResponse struct {
 		Name        string `json:"name"`
 		Code        string `json:"code"`
 		CurrentTime string `json:"currentTime"`
-		UtcOffset   int    `json:"utcOffset"`
 		DstOffset   int    `json:"dstOffset"`
+		UtcOffset   int    `json:"utcOffset"`
 	} `json:"timeZone"`
 }
 
