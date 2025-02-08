@@ -2,7 +2,7 @@ import {Box, Tabs, Text} from '@mantine/core'
 import Radar from 'radar-sdk-js';
 import 'radar-sdk-js/dist/radar.css'
 import RadarMap from 'radar-sdk-js/dist/ui/RadarMap';
-import { useEffect, useLayoutEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 
 export default function Search(){
