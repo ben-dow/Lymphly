@@ -6,14 +6,14 @@ type PrimaryKey struct {
 }
 
 const (
-	ProvidersPk string = "provider"
+	ProviderPk string = "providers"
 )
 
 type Provider struct {
-	ProviderId string
-	Name       string
-	PracticeId string
-	Tags       []string
+	ProviderId string   `json:"providerId,omitempty"`
+	Name       string   `json:"name,omitempty"`
+	PracticeId string   `json:"practiceId,omitempty"`
+	Tags       []string `json:"tags,omitempty"`
 }
 
 type ProviderRecord struct {
@@ -22,23 +22,24 @@ type ProviderRecord struct {
 }
 
 const (
-	PracticesPk string = "practice"
+	PracticesPk             string = "practices"
+	PracticeGeoHashPkPrefix string = "practicehash#"
 )
 
 type Practice struct {
-	PracticeId  string
-	Name        string
-	FullAddress string
-	Lattitude   float64
-	Longitude   float64
-	GeoHash     string
-	Phone       string
-	Website     string
-	State       string
-	StateCode   string
-	Country     string
-	CountryCode string
-	Tags        []string
+	PracticeId  string   `json:"practiceId,omitempty"`
+	Name        string   `json:"name,omitempty"`
+	FullAddress string   `json:"fullAddress,omitempty"`
+	Lattitude   float64  `json:"lattitude,omitempty"`
+	Longitude   float64  `json:"longitude,omitempty"`
+	GeoHash     string   `json:"geoHash,omitempty"`
+	Phone       string   `json:"phone,omitempty"`
+	Website     string   `json:"website,omitempty"`
+	State       string   `json:"state,omitempty"`
+	StateCode   string   `json:"stateCode,omitempty"`
+	Country     string   `json:"country,omitempty"`
+	CountryCode string   `json:"countryCode,omitempty"`
+	Tags        []string `json:"tags,omitempty"`
 }
 
 type PracticeRecord struct {
@@ -46,17 +47,7 @@ type PracticeRecord struct {
 	Practice
 }
 
-const (
-	PracticeGeoHashPkPrefix string = "practicehash#"
-	ProviderGeoHashPkPrefix string = "providerhash#"
-)
-
 type PracticeGeoHashRecord struct {
 	PrimaryKey
 	Practice
-}
-
-type ProviderGeoHashRecord struct {
-	PrimaryKey
-	Provider
 }

@@ -24,7 +24,7 @@ func init() {
 func PutPractice(ctx context.Context, id, name, address, phone, website, tags string) (*Practice, error) {
 
 	primaryKey := PrimaryKey{
-		PartitionKey: "practices",
+		PartitionKey: PracticesPk,
 		SortKey:      id,
 	}
 
@@ -68,7 +68,6 @@ func PutPractice(ctx context.Context, id, name, address, phone, website, tags st
 		GeoHash:     geohash.EncodeWithPrecision(resp.Addresses[0].Latitude, resp.Addresses[0].Longitude, 4),
 		Phone:       phone,
 		Website:     website,
-		Tags:        strings.Split(tags, ","),
 	}
 
 	execgroup := new(errgroup.Group)
@@ -119,7 +118,7 @@ func PutPractice(ctx context.Context, id, name, address, phone, website, tags st
 func PutProvider(ctx context.Context, id, name, tags string, practice *Practice) (*Provider, error) {
 
 	primaryKey := PrimaryKey{
-		PartitionKey: "providers",
+		PartitionKey: ProviderPk,
 		SortKey:      id,
 	}
 
@@ -145,54 +144,24 @@ func PutProvider(ctx context.Context, id, name, tags string, practice *Practice)
 		return &out.Provider, nil
 	}
 
-	provider := Provider{
-		ProviderId: id,
-		Name:       name,
-		Tags:       strings.Split(tags, ","),
-		PracticeId: practice.PracticeId,
+	providerRecord := &ProviderRecord{
+		PrimaryKey: primaryKey,
+		Provider: Provider{
+			ProviderId: id,
+			Name:       name,
+			Tags:       strings.Split(tags, ","),
+			PracticeId: practice.PracticeId,
+		},
 	}
 
-	execgroup := new(errgroup.Group)
-
-	execgroup.Go(func() error {
-		providerRecord := &ProviderRecord{
-			PrimaryKey: primaryKey,
-			Provider:   provider,
-		}
-		marshaledRecord, _ := attributevalue.MarshalMap(providerRecord)
-		_, err = db.PutItem(ctx, &dynamodb.PutItemInput{
-			TableName: &cfg.Cfg().TableName,
-			Item:      marshaledRecord,
-		})
-		if err != nil {
-			return err
-		}
-		return nil
+	marshaledRecord, _ := attributevalue.MarshalMap(providerRecord)
+	_, err = db.PutItem(ctx, &dynamodb.PutItemInput{
+		TableName: &cfg.Cfg().TableName,
+		Item:      marshaledRecord,
 	})
-
-	execgroup.Go(func() error {
-		providerGeoHashRecord := &ProviderGeoHashRecord{
-			PrimaryKey: PrimaryKey{
-				PartitionKey: fmt.Sprintf("%s%s", ProviderGeoHashPkPrefix, practice.GeoHash),
-				SortKey:      provider.ProviderId,
-			},
-			Provider: provider,
-		}
-		marshaledRecord, _ := attributevalue.MarshalMap(providerGeoHashRecord)
-		_, err = db.PutItem(ctx, &dynamodb.PutItemInput{
-			TableName: &cfg.Cfg().TableName,
-			Item:      marshaledRecord,
-		})
-		if err != nil {
-			return err
-		}
-		return nil
-	})
-
-	err = execgroup.Wait()
 	if err != nil {
 		return nil, err
 	}
 
-	return &provider, nil
+	return &providerRecord.Provider, nil
 }

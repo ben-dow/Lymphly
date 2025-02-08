@@ -12,7 +12,6 @@ import (
 )
 
 func GetAllPractices(ctx context.Context) ([]Practice, error) {
-
 	keyCond := expression.Key("pk").Equal(expression.Value("practices"))
 	expr, _ := expression.NewBuilder().WithKeyCondition(keyCond).Build()
 
