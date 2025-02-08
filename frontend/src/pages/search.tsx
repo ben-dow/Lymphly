@@ -28,12 +28,9 @@ function SearchContainer(){
     useEffect(() => {
         fetch("/api/v1/providersearch/practices/all").then((r) =>r.json()).then(j=>{
             const pr: MapProps = j
-            console.log(pr)
-            console.log(j)
             setPractices(pr.Practices)
         })
     }, [])
-
 
     return(
         <Box className={"bg-emerald-100 p-5 flex flex-col gap-10 shadow-sm w-full xl:w-1/2 p-10 rounded-xl"}>
@@ -104,6 +101,7 @@ function Map(props:MapProps){
             
             for (let index = 0; index < props.Practices.length; index++) {
                 const element = props.Practices[index];
+                console.log(element)
                 
                 Radar.ui.marker({
                     color: '#000257',
