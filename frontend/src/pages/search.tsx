@@ -1,7 +1,8 @@
 import {Box, Tabs, Text} from '@mantine/core'
 import Radar from 'radar-sdk-js';
 import 'radar-sdk-js/dist/radar.css'
-import { useEffect, useState } from 'react';
+import RadarMap from 'radar-sdk-js/dist/ui/RadarMap';
+import { useEffect, useLayoutEffect, useState } from 'react';
 
 
 export default function Search(){
@@ -90,29 +91,36 @@ interface MapProps {
 }
 
 function Map(props:MapProps){
-    useEffect(() => {
+
+    const [map, setMap] = useState<RadarMap>()
+
+    useLayoutEffect(()=>{
         fetch("/radar_pub_key.txt").then((r) =>r.text()).then(text=>{
             Radar.initialize(text);
-            const Map = Radar.ui.map({
-                container: "map",
-                center: [-98.5556199, 39.8097343],
-                zoom: 2,
-            })
-            
+        })
+    }, [])
+
+    useEffect(() => {
+        const Map = Radar.ui.map({
+            container: "map",
+            center: [-98.5556199, 39.8097343],
+            zoom: 2,
+        })
+        setMap(Map)
+    }, [])
+
+    useEffect(() => {
+        if (map != undefined){
             for (let index = 0; index < props.Practices.length; index++) {
                 const element = props.Practices[index];
-                console.log(element)
-                
                 Radar.ui.marker({
                     color: '#000257',
                     width: 10,
                     height: 20,
-                }).setLngLat([element.Long, element.Lat]).addTo(Map)
+                }).setLngLat([element.Long, element.Lat]).addTo(map)
             }
-
-            Map.redraw()
-        })
-      }, []);
+        }
+      }, [props, map]);
 
       return(
         <Box className='w-full h-full'>
