@@ -55,7 +55,7 @@ func PutNewProvider(w http.ResponseWriter, r *http.Request) {
 	//providerId := base64.URLEncoding.EncodeToString(h.Sum(nil))
 
 	// Save Practice
-	err = data.PutPractice(r.Context(), practiceId, requestBody.Practice, requestBody.FullAddress, requestBody.Phone, requestBody.Website, requestBody.PracticeTags)
+	_, err = data.PutPractice(r.Context(), practiceId, requestBody.Practice, requestBody.FullAddress, requestBody.Phone, requestBody.Website, requestBody.PracticeTags)
 	if err != nil {
 		out := map[string]string{
 			"error": err.Error(),

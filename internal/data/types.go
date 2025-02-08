@@ -9,20 +9,23 @@ const (
 	ProvidersPk string = "provider"
 )
 
-type ProviderRecord struct {
-	PrimaryKey
+type Provider struct {
 	ProviderId string
 	Name       string
 	Type       string
 	PracticeId string
 }
 
+type ProviderRecord struct {
+	PrimaryKey
+	Provider
+}
+
 const (
 	PracticesPk string = "practice"
 )
 
-type PracticeRecord struct {
-	PrimaryKey
+type Practice struct {
 	PracticeId  string
 	Name        string
 	FullAddress string
@@ -33,12 +36,22 @@ type PracticeRecord struct {
 	Website     string
 }
 
+type PracticeRecord struct {
+	PrimaryKey
+	Practice
+}
+
 const (
-	GeoHashPkPrefix    string = "geohash#"
-	GeoHashSkPractices string = "practices"
+	PracticeGeoHashPkPrefix string = "practicehash#"
+	ProviderGeoHashPkPrefix string = "providerhash#"
 )
 
-type PracticeGeoHash struct {
+type PracticeGeoHashRecord struct {
 	PrimaryKey
-	Practices []string
+	Practice
+}
+
+type ProviderGeoHashRecord struct {
+	PrimaryKey
+	Provider
 }

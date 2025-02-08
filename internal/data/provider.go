@@ -2,26 +2,25 @@ package data
 
 import (
 	"context"
+	"fmt"
 	"lymphly/internal/cfg"
 	"lymphly/internal/geo"
 
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
-	"github.com/aws/aws-sdk-go-v2/service/location"
 	"github.com/mmcloughlin/geohash"
+	"golang.org/x/sync/errgroup"
 )
 
 var db *dynamodb.Client
-var loc *location.Client
 
 func init() {
 	cfg, _ := config.LoadDefaultConfig(context.Background())
 	db = dynamodb.NewFromConfig(cfg)
-	loc = location.NewFromConfig(cfg)
 }
 
-func PutPractice(ctx context.Context, id, name, address, phone, website, tags string) error {
+func PutPractice(ctx context.Context, id, name, address, phone, website, tags string) (*Practice, error) {
 
 	primaryKey := PrimaryKey{
 		PartitionKey: "practices",
@@ -38,20 +37,24 @@ func PutPractice(ctx context.Context, id, name, address, phone, website, tags st
 		},
 	)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	if res.Item != nil {
-		return nil
+		out := &PracticeRecord{}
+		err := attributevalue.UnmarshalMap(res.Item, out)
+		if err != nil {
+			return nil, err
+		}
+		return &out.Practice, nil
 	}
 
 	resp, err := geo.GeocodeAddress(address)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	practiceRecord := &PracticeRecord{
-		PrimaryKey:  primaryKey,
+	practice := Practice{
 		PracticeId:  id,
 		Name:        name,
 		FullAddress: address,
@@ -62,17 +65,49 @@ func PutPractice(ctx context.Context, id, name, address, phone, website, tags st
 		Website:     website,
 	}
 
-	marshaledRecord, _ := attributevalue.MarshalMap(practiceRecord)
+	execgroup := new(errgroup.Group)
 
-	_, err = db.PutItem(ctx, &dynamodb.PutItemInput{
-		TableName: &cfg.Cfg().TableName,
-		Item:      marshaledRecord,
+	execgroup.Go(func() error {
+		practiceRecord := &PracticeRecord{
+			PrimaryKey: primaryKey,
+			Practice:   practice,
+		}
+		marshaledRecord, _ := attributevalue.MarshalMap(practiceRecord)
+		_, err = db.PutItem(ctx, &dynamodb.PutItemInput{
+			TableName: &cfg.Cfg().TableName,
+			Item:      marshaledRecord,
+		})
+		if err != nil {
+			return err
+		}
+		return nil
 	})
+
+	execgroup.Go(func() error {
+		practiceRecord := &PracticeGeoHashRecord{
+			PrimaryKey: PrimaryKey{
+				PartitionKey: fmt.Sprintf("%s%s", PracticeGeoHashPkPrefix, practice.GeoHash),
+				SortKey:      practice.PracticeId,
+			},
+			Practice: practice,
+		}
+		marshaledRecord, _ := attributevalue.MarshalMap(practiceRecord)
+		_, err = db.PutItem(ctx, &dynamodb.PutItemInput{
+			TableName: &cfg.Cfg().TableName,
+			Item:      marshaledRecord,
+		})
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+
+	err = execgroup.Wait()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	return &practice, nil
 }
 
 func PutProvider(id, name, tags, practiceId string) error {
