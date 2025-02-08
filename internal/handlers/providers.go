@@ -62,8 +62,8 @@ func PutNewProvider(w http.ResponseWriter, r *http.Request) {
 		}
 		outBytes, _ := json.Marshal(out)
 		w.Header().Set("Content-Type", "application/json")
-		w.Write(outBytes)
 		w.WriteHeader(http.StatusInternalServerError)
+		w.Write(outBytes)
 		return
 	}
 
