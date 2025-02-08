@@ -26,7 +26,7 @@ function SearchContainer(){
     const [practices, setPractices] = useState<Practice[]>([])
 
     useEffect(() => {
-        fetch("/radar_pub_key.txt").then((r) =>r.json()).then(j=>{
+        fetch("/api/v1/providersearch/practices/all").then((r) =>r.json()).then(j=>{
             const ps: [] = j["Practices"]
             setPractices(ps as Practice[])
         })
