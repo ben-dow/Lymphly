@@ -71,6 +71,37 @@ func PutNewProvider(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-func GetNearbyProvidersByLatLong(w http.ResponseWriter, r *http.Request) {
+type ListPracticesItem struct {
+	PracticeId string
+	Name       string
+	Lat        float64
+	Long       float64
+}
 
+type ListPracticesResponse struct {
+	Practices []ListPracticesItem
+}
+
+func ListPractices(w http.ResponseWriter, r *http.Request) {
+	d, err := data.GetAllPractices(r.Context())
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	response := &ListPracticesResponse{
+		Practices: make([]ListPracticesItem, len(d)),
+	}
+	for idx, p := range d {
+		response.Practices[idx] = ListPracticesItem{
+			PracticeId: p.PracticeId,
+			Name:       p.Name,
+			Lat:        p.Lattitude,
+			Long:       p.Longitude,
+		}
+	}
+
+	outBytes, _ := json.Marshal(response)
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(outBytes)
 }

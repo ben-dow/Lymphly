@@ -74,22 +74,11 @@ function Map(){
     useEffect(() => {
         fetch("/radar_pub_key.txt").then((r) =>r.text()).then(text=>{
             Radar.initialize(text);
-            const map = Radar.ui.map({
+            Radar.ui.map({
                 container: "map",
                 center: [-98.5556199, 39.8097343],
                 zoom: 2,
             })
-
-            Radar.ui.marker({
-                color: '#000257',
-                width: 40,
-                height: 80,
-                popup: {
-                  text: 'My popup.',
-                }
-              })
-              .setLngLat([-73.990550, 40.735225])
-              .addTo(map);
         })
 
         
