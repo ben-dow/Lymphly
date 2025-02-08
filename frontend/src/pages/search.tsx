@@ -27,8 +27,8 @@ function SearchContainer(){
 
     useEffect(() => {
         fetch("/api/v1/providersearch/practices/all").then((r) =>r.json()).then(j=>{
-            const pr: MapProps = JSON.parse(j)
-            setPractices(pr.Practices)
+            const pr: MapProps = j
+            setPractices(pr)
         })
     }, [])
 
