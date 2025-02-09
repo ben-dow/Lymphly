@@ -11,6 +11,8 @@ import (
 func RetrieveRoutes(r chi.Router) {
 	r.Get("/practices/all", AllPractices)
 	r.Get("/practice/{practiceId}", GetPractice)
+	r.Get("/practice/{practiceId}/providers", GetPracticeProviders)
+
 }
 
 type LimitedPracticeItem struct {
@@ -62,5 +64,33 @@ func GetPractice(w http.ResponseWriter, r *http.Request) {
 	}
 
 	practiceBytes, _ := json.Marshal(practice)
+	w.Header().Set("Content-Type", "application/json")
 	w.Write(practiceBytes)
+}
+
+type ProvidersByPracticeResponse struct {
+	PracticeId string          `json:"practiceId"`
+	Providers  []data.Provider `json:"providers"`
+}
+
+func GetPracticeProviders(w http.ResponseWriter, r *http.Request) {
+	practiceId := chi.URLParam(r, "practiceId")
+	if practiceId == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	providers, err := data.GetProvidersByPracticeId(r.Context(), practiceId)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+	}
+
+	response := &ProvidersByPracticeResponse{
+		PracticeId: practiceId,
+		Providers:  providers,
+	}
+
+	respBytes, _ := json.Marshal(response)
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(respBytes)
 }

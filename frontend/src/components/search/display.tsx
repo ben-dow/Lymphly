@@ -28,8 +28,6 @@ export function DataDisplay(props:DataDisplayProps) {
 
 
 export function PracticeTable(props: DataDisplayProps){
-    console.log("test")
-
     return (
     <Table>
         <Table.Thead>
