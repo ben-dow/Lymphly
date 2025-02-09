@@ -80,7 +80,7 @@ func GetProvider(ctx context.Context, providerId string) (*Provider, error) {
 
 func GetProvidersByPracticeId(ctx context.Context, practiceId string) ([]Provider, error) {
 	keyCond := expression.Key("pk").Equal(expression.Value(ProviderPk))
-	filters := expression.Name("practiceId").Equal(expression.Value(practiceId))
+	filters := expression.Name("PracticeId").Equal(expression.Value(practiceId))
 
 	expr, err := expression.NewBuilder().WithKeyCondition(keyCond).WithFilter(filters).Build()
 	if err != nil {

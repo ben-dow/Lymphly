@@ -12,7 +12,6 @@ func RetrieveRoutes(r chi.Router) {
 	r.Get("/practices/all", AllPractices)
 	r.Get("/practice/{practiceId}", GetPractice)
 	r.Get("/practice/{practiceId}/providers", GetPracticeProviders)
-
 }
 
 type LimitedPracticeItem struct {
