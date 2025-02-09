@@ -2,7 +2,7 @@ import { Box, Table, Tabs } from "@mantine/core";
 import Radar from "radar-sdk-js";
 import RadarMap from "radar-sdk-js/dist/ui/RadarMap";
 import { useEffect, useState } from "react";
-import { PracticeList as PracticeListI } from "../../model/practice";
+import { LimitedPracticePracticeListI as LimitedPracticesListI, PracticeListI as PracticeListI } from "../../model/practice";
 
 
 interface DataDisplayProps {
@@ -26,6 +26,7 @@ export function DataDisplay(props:DataDisplayProps) {
     )
 }
 
+
 export function PracticeTable(props: DataDisplayProps){
     console.log("test")
 
@@ -46,8 +47,11 @@ export function PracticeTable(props: DataDisplayProps){
 
 }
 
+interface MapProps{
+    practiceList: LimitedPracticesListI
+}
 
-export function Map(props: DataDisplayProps){
+export function Map(props: MapProps){
     const [map, setMap] = useState<RadarMap>()
     const practiceList = props.practiceList.practices
 
@@ -65,6 +69,7 @@ export function Map(props: DataDisplayProps){
     }, [])
 
     useEffect(() => {
+        map.clearMarkers()
         if (map != undefined){
             for (let index = 0; index < practiceList.length; index++) {
                 const element = practiceList[index];

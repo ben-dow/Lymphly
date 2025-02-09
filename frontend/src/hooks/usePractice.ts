@@ -1,5 +1,5 @@
 import { useReducer } from "react";
-import { PracticeI, PracticeList } from "../model/practice";
+import { PracticeI, PracticeListI } from "../model/practice";
 
 type PracticeState = {
     [key: string]: PracticeI
@@ -12,7 +12,7 @@ enum PracticeActionKind {
 
 interface PracticeAction {
     type: PracticeActionKind
-    itemList:  PracticeList
+    itemList:  PracticeListI
     item: PracticeI
 } 
 
@@ -44,6 +44,6 @@ export function usePractices() {
     const [practices, updatePractices] = useReducer(practiceDispatch, null, ()=>{return {}});
 
     const getPractice = function(id: string){
-        
+
     }
 }

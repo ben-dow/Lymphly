@@ -1,7 +1,7 @@
 import {Box, Tabs, Text} from '@mantine/core'
 import 'radar-sdk-js/dist/radar.css'
 import { useEffect, useState } from 'react';
-import { PracticeList } from '../model/practice';
+import { PracticeListI } from '../model/practice';
 import { DataDisplay, Map } from '../components/search/display';
 
 
@@ -19,17 +19,17 @@ export default function Search(){
 
 function SearchContainer(){
 
-    const [practices, setPractices] = useState<PracticeList>({practices:[]})
+    const [practices, setPractices] = useState<PracticeListI>({practices:[]})
 
     useEffect(() => {
         fetch("/api/v1/providersearch/practices/all").then((r) =>r.json()).then(j=>{
-            const pl: PracticeList = j
+            const pl: PracticeListI = j
             setPractices(pl)
         })
     }, [])
 
     return(
-        <Box className={"bg-emerald-100 p-5 flex flex-col gap-10 shadow-sm w-full xl:w-1/2 p-10 rounded-xl"}>
+        <Box className={"bg-emerald-100 p-5 flex flex-col gap-10 shadow-sm w-full xl:w-1/2 rounded-xl"}>
             <Box className="text-center">
                 <Text size="xl" fw={700}>Find A Provider By:</Text>
             </Box>
@@ -53,7 +53,7 @@ function SearchContainer(){
             </Box>
 
             <Box>
-                <DataDisplay practiceList={practices}/>
+                <Map practiceList={practices}/>
             </Box>
 
         </Box>            

@@ -14,6 +14,17 @@ export interface PracticeI {
     tags: string[]
 }
 
+export interface LimitedPracticePracticeListI {
+    practices: LimitedPracticeI[]
+}
+
+export interface LimitedPracticeI {
+    practiceId: string
+    name: string
+    lattitude: number
+    longitude: number
+}
+
 export interface ProviderI {
     providerId: string
     practiceId: string
@@ -21,11 +32,11 @@ export interface ProviderI {
     tags: string[]
 }
 
-export interface PracticeList {
+export interface PracticeListI {
     practices: PracticeI[]
 }
 
-export interface ProviderList {
+export interface ProviderListI {
     providers: ProviderI[]
 }
 
