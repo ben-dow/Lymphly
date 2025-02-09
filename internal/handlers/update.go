@@ -1,14 +1,10 @@
 package handlers
 
 import (
-	"encoding/base64"
 	"encoding/json"
-	"fmt"
 	"io"
 	"lymphly/internal/data"
 	"net/http"
-
-	"golang.org/x/crypto/sha3"
 )
 
 type NewProviderRequest struct {
@@ -22,7 +18,6 @@ type NewProviderRequest struct {
 }
 
 func PutNewProvider(w http.ResponseWriter, r *http.Request) {
-
 	// Ready Body
 	b, err := io.ReadAll(r.Body)
 	if err != nil {
@@ -38,31 +33,15 @@ func PutNewProvider(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Hasher for Determing Ids
-	h := sha3.New512()
-
-	// Determine Pratice Id
-	practice := fmt.Sprintf("%s-%s", requestBody.Practice, requestBody.FullAddress)
-	h.Write([]byte(practice))
-	practiceId := base64.URLEncoding.EncodeToString(h.Sum(nil))
-
-	// Reset Hasher
-	h.Reset()
-
-	// Determine Provider Id
-	provider := fmt.Sprintf("%s-%s", requestBody.Name, practiceId)
-	h.Write([]byte(provider))
-	providerId := base64.URLEncoding.EncodeToString(h.Sum(nil))
-
 	// Save Practice
-	savedPractice, err := data.PutPractice(r.Context(), practiceId, requestBody.Practice, requestBody.FullAddress, requestBody.Phone, requestBody.Website, requestBody.PracticeTags)
+	savedPractice, err := data.PutPractice(r.Context(), requestBody.Practice, requestBody.FullAddress, requestBody.Phone, requestBody.Website, requestBody.PracticeTags)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
 	// Save Provider
-	_, err = data.PutProvider(r.Context(), providerId, requestBody.Name, requestBody.ProviderTags, savedPractice)
+	_, err = data.PutProvider(r.Context(), requestBody.Name, requestBody.ProviderTags, savedPractice)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return

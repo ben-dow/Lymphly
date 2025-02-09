@@ -13,7 +13,7 @@ func main() {
 	r := chi.NewRouter()
 	r.Route(cfg.Cfg().BasePath, func(r chi.Router) {
 		handlers.GeneralRoutes(r)
-		r.Get("/practices/all", handlers.ListPractices)
+		handlers.RetrieveRoutes(r)
 	})
 
 	adapter := chiadapter.New(r)

@@ -4,47 +4,42 @@ import (
 	"encoding/json"
 	"lymphly/internal/data"
 	"net/http"
+
+	"github.com/go-chi/chi/v5"
 )
 
-type ListPracticesItem struct {
-	PracticeId  string   `json:"practice_id,omitempty"`
-	Name        string   `json:"name,omitempty"`
-	Lattitude   float64  `json:"lattitude,omitempty"`
-	Longitude   float64  `json:"longitude,omitempty"`
-	Phone       string   `json:"phone,omitempty"`
-	Website     string   `json:"website,omitempty"`
-	State       string   `json:"state,omitempty"`
-	StateCode   string   `json:"stateCode,omitempty"`
-	CountryCode string   `json:"countryCode,omitempty"`
-	Tags        []string `json:"tags,omitempty"`
+func RetrieveRoutes(r chi.Router) {
+	r.Get("/practices/all", Health)
 }
 
-type ListPracticesResponse struct {
-	Practices []ListPracticesItem `json:"practices,omitempty"`
+type LimitedPracticeItem struct {
+	PracticeId string  `json:"practiceId,"`
+	Name       string  `json:"name"`
+	Lattitude  float64 `json:"lattitude"`
+	Longitude  float64 `json:"longitude"`
 }
 
-func ListPractices(w http.ResponseWriter, r *http.Request) {
-	d, err := data.GetAllPractices(r.Context())
+type AllPracticesResponse struct {
+	Practices []LimitedPracticeItem `json:"practices,omitempty"`
+}
+
+func AllPractices(w http.ResponseWriter, r *http.Request) {
+	d, err := data.QueryPractices(r.Context())
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	response := &ListPracticesResponse{
-		Practices: make([]ListPracticesItem, len(d)),
+	response := &AllPracticesResponse{
+		Practices: make([]LimitedPracticeItem, len(d)),
 	}
+
 	for idx, p := range d {
-		response.Practices[idx] = ListPracticesItem{
-			PracticeId:  p.PracticeId,
-			Name:        p.Name,
-			Lattitude:   p.Lattitude,
-			Longitude:   p.Longitude,
-			Phone:       p.Phone,
-			Website:     p.Website,
-			State:       p.State,
-			StateCode:   p.StateCode,
-			CountryCode: p.CountryCode,
-			Tags:        p.Tags,
+		response.Practices[idx] = LimitedPracticeItem{
+			PracticeId: p.PracticeId,
+			Name:       p.Name,
+			Lattitude:  p.Lattitude,
+			Longitude:  p.Longitude,
 		}
 	}
 
