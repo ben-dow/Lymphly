@@ -11,7 +11,10 @@ import (
 func RetrieveRoutes(r chi.Router) {
 	r.Get("/practices/all", AllPractices)
 	r.Get("/practice/{practiceId}", GetPractice)
-	r.Get("/practice/{practiceId}/providers", GetPracticeProviders)
+	r.Get("/practice/{practiceId}/providers", GetPracticeByProviders)
+	r.Get("/provider/{providerId}", GetProvider)
+	r.Get("/provider/{providerId}/practice", GetPracticeByProvider)
+
 }
 
 type LimitedPracticeItem struct {
@@ -72,7 +75,7 @@ type ProvidersByPracticeResponse struct {
 	Providers  []data.Provider `json:"providers"`
 }
 
-func GetPracticeProviders(w http.ResponseWriter, r *http.Request) {
+func GetPracticeByProviders(w http.ResponseWriter, r *http.Request) {
 	practiceId := chi.URLParam(r, "practiceId")
 	if practiceId == "" {
 		w.WriteHeader(http.StatusBadRequest)
@@ -92,4 +95,43 @@ func GetPracticeProviders(w http.ResponseWriter, r *http.Request) {
 	respBytes, _ := json.Marshal(response)
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(respBytes)
+}
+
+func GetProvider(w http.ResponseWriter, r *http.Request) {
+	providerId := chi.URLParam(r, "providerId")
+	if providerId == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	provider, err := data.GetProvider(r.Context(), providerId)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+	}
+
+	responseBytes, _ := json.Marshal(provider)
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(responseBytes)
+}
+
+func GetPracticeByProvider(w http.ResponseWriter, r *http.Request) {
+	providerId := chi.URLParam(r, "providerId")
+	if providerId == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	provider, err := data.GetProvider(r.Context(), providerId)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+	}
+
+	practice, err := data.GetPractice(r.Context(), provider.PracticeId)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+	}
+
+	practiceBytes, _ := json.Marshal(practice)
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(practiceBytes)
 }
