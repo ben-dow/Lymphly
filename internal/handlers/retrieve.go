@@ -20,7 +20,7 @@ type LimitedPracticeItem struct {
 }
 
 type AllPracticesResponse struct {
-	Practices []LimitedPracticeItem `json:"practices,omitempty"`
+	Practices []LimitedPracticeItem `json:"practices"`
 }
 
 func AllPractices(w http.ResponseWriter, r *http.Request) {
