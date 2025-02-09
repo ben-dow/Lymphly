@@ -69,8 +69,8 @@ export function Map(props: MapProps){
     }, [])
 
     useEffect(() => {
-        map.clearMarkers()
         if (map != undefined){
+            map.clearMarkers()
             for (let index = 0; index < practiceList.length; index++) {
                 const element = practiceList[index];
                 Radar.ui.marker({
