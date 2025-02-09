@@ -9,7 +9,7 @@ import (
 )
 
 func RetrieveRoutes(r chi.Router) {
-	r.Get("/practices/all", Health)
+	r.Get("/practices/all", AllPractices)
 }
 
 type LimitedPracticeItem struct {
