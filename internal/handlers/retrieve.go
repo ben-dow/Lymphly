@@ -10,11 +10,12 @@ import (
 
 func RetrieveRoutes(r chi.Router) {
 	r.Get("/practices/all", AllPractices)
+	r.Get("/practices/locate/proximity", LocatePractice)
+	r.Get("/practices/state/{stateCode}", LocatePracticeByState)
 	r.Get("/practice/{practiceId}", GetPractice)
 	r.Get("/practice/{practiceId}/providers", GetPracticeByProviders)
 	r.Get("/provider/{providerId}", GetProvider)
 	r.Get("/provider/{providerId}/practice", GetPracticeByProvider)
-
 }
 
 type LimitedPracticeItem struct {
@@ -29,7 +30,7 @@ type AllPracticesResponse struct {
 }
 
 func AllPractices(w http.ResponseWriter, r *http.Request) {
-	d, err := data.QueryPractices(r.Context())
+	d, err := data.EnumerateAllPractices(r.Context())
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
@@ -63,6 +64,7 @@ func GetPractice(w http.ResponseWriter, r *http.Request) {
 	practice, err := data.GetPractice(r.Context(), practiceId)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 
 	practiceBytes, _ := json.Marshal(practice)
@@ -85,6 +87,7 @@ func GetPracticeByProviders(w http.ResponseWriter, r *http.Request) {
 	providers, err := data.GetProvidersByPracticeId(r.Context(), practiceId)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 
 	response := &ProvidersByPracticeResponse{
@@ -107,6 +110,7 @@ func GetProvider(w http.ResponseWriter, r *http.Request) {
 	provider, err := data.GetProvider(r.Context(), providerId)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 
 	responseBytes, _ := json.Marshal(provider)
@@ -124,14 +128,49 @@ func GetPracticeByProvider(w http.ResponseWriter, r *http.Request) {
 	provider, err := data.GetProvider(r.Context(), providerId)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 
 	practice, err := data.GetPractice(r.Context(), provider.PracticeId)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 
 	practiceBytes, _ := json.Marshal(practice)
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(practiceBytes)
+}
+
+type EnumeratedPractices struct {
+	Practices []data.Practice `json:"practices"`
+}
+
+func LocatePracticeByState(w http.ResponseWriter, r *http.Request) {
+	stateCode := chi.URLParam(r, "stateCode")
+	if stateCode == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	practices, err := data.EnumeratePracticesByState(r.Context(), stateCode)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	resp := &EnumeratedPractices{
+		Practices: practices,
+	}
+
+	outBytes, _ := json.Marshal(resp)
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(outBytes)
+}
+
+func LocatePractice(w http.ResponseWriter, r *http.Request) {
+	/// Query Parameters
+	// lat, long
+	// addr
+
 }
