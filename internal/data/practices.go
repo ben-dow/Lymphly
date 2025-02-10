@@ -162,7 +162,7 @@ func GetPractice(ctx context.Context, practiceId string) (*Practice, error) {
 
 func EnumeratePracticesByState(ctx context.Context, stateCode string) ([]Practice, error) {
 	keyCond := expression.Key("pk").Equal(expression.Value(PracticesPk))
-	cond := expression.Name("stateCode").Equal(expression.Value(stateCode))
+	cond := expression.Name("StateCode").Equal(expression.Value(stateCode))
 	expr, _ := expression.NewBuilder().WithKeyCondition(keyCond).WithFilter(cond).Build()
 
 	paginator := dynamodb.NewQueryPaginator(db, &dynamodb.QueryInput{

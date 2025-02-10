@@ -147,7 +147,7 @@ type EnumeratedPractices struct {
 }
 
 func LocatePracticeByState(w http.ResponseWriter, r *http.Request) {
-	stateCode := chi.URLParam(r, "StateCode")
+	stateCode := chi.URLParam(r, "stateCode")
 	if stateCode == "" {
 		w.WriteHeader(http.StatusBadRequest)
 		return
