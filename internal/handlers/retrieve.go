@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"lymphly/internal/data"
 	"net/http"
+	"strings"
 
 	"github.com/go-chi/chi/v5"
 )
@@ -153,6 +154,7 @@ func LocatePracticeByState(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	stateCode = strings.ToUpper(stateCode)
 	practices, err := data.EnumeratePracticesByState(r.Context(), stateCode)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
