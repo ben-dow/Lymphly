@@ -194,9 +194,81 @@ func EnumeratePracticesByState(ctx context.Context, stateCode string) ([]Practic
 	}
 
 	return out, nil
-
 }
 
-func GetPracticesByProximity(ctx context.Context, lattitude, longitude float64) ([]Practice, error) {
-	return nil, nil
+func EnumeratePracticesByGeoHash(ctx context.Context, hash string) ([]Practice, error) {
+	keyCond := expression.Key("pk").Equal(expression.Value(PracticeGeoHashPkPrefix + hash))
+	expr, _ := expression.NewBuilder().WithKeyCondition(keyCond).Build()
+
+	paginator := dynamodb.NewQueryPaginator(db, &dynamodb.QueryInput{
+		TableName:                 aws.String(cfg.Cfg().TableName),
+		KeyConditionExpression:    expr.KeyCondition(),
+		FilterExpression:          expr.Filter(),
+		ProjectionExpression:      expr.Projection(),
+		ExpressionAttributeNames:  expr.Names(),
+		ExpressionAttributeValues: expr.Values(),
+	})
+
+	results := []map[string]types.AttributeValue{}
+	for paginator.HasMorePages() {
+		res, err := paginator.NextPage(ctx)
+		if err != nil {
+			return nil, err
+		}
+		results = append(results, res.Items...)
+	}
+
+	out := make([]Practice, len(results))
+	for idx, r := range results {
+		res := Practice{}
+		err := attributevalue.UnmarshalMap(r, &res)
+		if err != nil {
+			return nil, err
+		}
+		out[idx] = res
+	}
+
+	return out, nil
+}
+
+func GetPracticesByProximity(ctx context.Context, lat, long float64, radius int) ([]Practice, error) {
+	originHash := geohash.EncodeWithPrecision(lat, long, 4)
+
+	neighborMap := map[string][]Practice{}
+	hashes := geo.Neighbors(originHash, (radius/10)+1)
+	for _, h := range hashes {
+		if _, ok := neighborMap[h]; !ok {
+			neighborMap[h] = []Practice{}
+		}
+	}
+
+	prs := []Practice{}
+
+	execgroup := new(errgroup.Group)
+
+	for h := range neighborMap {
+		execgroup.Go(func() error {
+			practices, err := EnumeratePracticesByGeoHash(ctx, h)
+			if err != nil {
+				return err
+			}
+
+			out := []Practice{}
+			for _, p := range practices {
+				if geo.InRadius(lat, long, p.Lattitude, p.Longitude, radius) {
+					out = append(out, p)
+				}
+			}
+
+			neighborMap[h] = append(prs, out...)
+			return nil
+		})
+	}
+
+	err := execgroup.Wait()
+	if err != nil {
+		return nil, err
+	}
+
+	return prs, nil
 }

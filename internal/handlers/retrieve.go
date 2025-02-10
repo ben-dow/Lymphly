@@ -1,9 +1,13 @@
 package handlers
 
 import (
+	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"lymphly/internal/data"
+	"lymphly/internal/geo"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/go-chi/chi/v5"
@@ -175,4 +179,72 @@ func LocatePractice(w http.ResponseWriter, r *http.Request) {
 	// lat, long
 	// addr
 
+	latStr := r.URL.Query().Get("lat")
+	longStr := r.URL.Query().Get("long")
+	addrB64 := r.URL.Query().Get("addr")
+	radius := r.URL.Query().Get("radius")
+	radiusMi, err := strconv.Atoi(radius)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	if radiusMi < 0 {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	var lat float64
+	var long float64
+
+	// Process Lat/Long First
+	if latStr != "" && longStr != "" {
+		lat, err = strconv.ParseFloat(latStr, 64)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+
+		long, err = strconv.ParseFloat(longStr, 64)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		goto execute
+	}
+
+	// If not Lat/Long, Check Address
+	if addrB64 != "" {
+		addrBytes, err := base64.URLEncoding.DecodeString(addrB64)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		addr := string(addrBytes)
+
+		addrGeocode, err := geo.GeocodeAddress(addr)
+		if errors.Is(err, geo.ErrBadAddress) {
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+
+		lat = addrGeocode.Addresses[0].Latitude
+		long = addrGeocode.Addresses[0].Longitude
+		goto execute
+	}
+
+execute:
+	practices, err := data.GetPracticesByProximity(r.Context(), lat, long, radiusMi)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	resp := &EnumeratedPractices{
+		Practices: practices,
+	}
+
+	outBytes, _ := json.Marshal(resp)
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(outBytes)
 }

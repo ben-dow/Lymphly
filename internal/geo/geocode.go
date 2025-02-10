@@ -7,6 +7,9 @@ import (
 	"lymphly/internal/cfg"
 	"net/http"
 	"net/url"
+
+	"github.com/mmcloughlin/geohash"
+	"github.com/umahmood/haversine"
 )
 
 var httpClient = &http.Client{}
@@ -53,6 +56,8 @@ type GeocodeResponse struct {
 	Addresses []AddressResponse `json:"addresses,omitempty"`
 }
 
+var ErrBadAddress = errors.New("address was bad")
+
 func GeocodeAddress(addr string) (*GeocodeResponse, error) {
 
 	req, err := http.NewRequest("GET", "https://api.radar.io/v1/geocode/forward?query="+url.QueryEscape(addr), nil)
@@ -67,6 +72,10 @@ func GeocodeAddress(addr string) (*GeocodeResponse, error) {
 	}
 
 	if resp.StatusCode != 200 {
+		if resp.StatusCode == 404 || resp.StatusCode == 400 {
+			return nil, ErrBadAddress
+		}
+
 		return nil, errors.New("request was not successful")
 	}
 
@@ -84,4 +93,31 @@ func GeocodeAddress(addr string) (*GeocodeResponse, error) {
 	}
 
 	return out, nil
+}
+
+func InRadius(originLat, originLong, destLat, destLong float64, radiusMi int) bool {
+	mi, _ := haversine.Distance(
+		haversine.Coord{
+			Lat: originLat,
+			Lon: originLong,
+		},
+		haversine.Coord{
+			Lat: destLat,
+			Lon: destLong,
+		})
+
+	return mi <= float64(radiusMi)
+}
+
+func Neighbors(hash string, depth int) []string {
+	hashes := geohash.Neighbors(hash)
+
+	out := []string{}
+	if depth > 0 {
+		for _, h := range hashes {
+			out = append(out, Neighbors(h, depth)...)
+		}
+	}
+
+	return append(hashes, out...)
 }
