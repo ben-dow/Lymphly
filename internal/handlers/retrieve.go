@@ -11,7 +11,7 @@ import (
 func RetrieveRoutes(r chi.Router) {
 	r.Get("/practices/all", AllPractices)
 	r.Get("/practices/locate/proximity", LocatePractice)
-	r.Get("/practices/state/{stateCode}", LocatePracticeByState)
+	r.Get("/practices/locate/state/{stateCode}", LocatePracticeByState)
 	r.Get("/practice/{practiceId}", GetPractice)
 	r.Get("/practice/{practiceId}/providers", GetPracticeByProviders)
 	r.Get("/provider/{providerId}", GetProvider)
@@ -147,7 +147,7 @@ type EnumeratedPractices struct {
 }
 
 func LocatePracticeByState(w http.ResponseWriter, r *http.Request) {
-	stateCode := chi.URLParam(r, "stateCode")
+	stateCode := chi.URLParam(r, "StateCode")
 	if stateCode == "" {
 		w.WriteHeader(http.StatusBadRequest)
 		return
