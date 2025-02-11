@@ -272,16 +272,19 @@ func GetPracticesByProximity(ctx context.Context, lat, long float64, radius int)
 
 	mu := sync.Mutex{}
 	out := []Practice{}
+	wg := sync.WaitGroup{}
 	for _, p := range practices {
+		wg.Add(1)
 		go func() {
 			if geo.InRadius(lat, long, p.Lattitude, p.Longitude, radius) {
 				mu.Lock()
 				out = append(out, p)
 				mu.Unlock()
 			}
+			wg.Done()
 		}()
-
 	}
+	wg.Wait()
 
 	return out, nil
 }
