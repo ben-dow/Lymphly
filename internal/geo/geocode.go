@@ -112,9 +112,8 @@ func InRadius(originLat, originLong, destLat, destLong float64, radiusMi int) bo
 
 func Neighbors(hash string, depth int) []string {
 
-	s := map[string]bool{
-		hash: true,
-	}
+	s := sync.Map{}
+	s.Store(hash, true)
 
 	directions := []geohash.Direction{
 		geohash.North,
@@ -129,22 +128,24 @@ func Neighbors(hash string, depth int) []string {
 
 	wg := sync.WaitGroup{}
 	for i := depth; i >= 0; i-- {
-		for k := range s {
+		s.Range(func(key, value any) bool {
 			for _, d := range directions {
 				wg.Add(1)
 				go func() {
-					s[geohash.Neighbor(k, d)] = true
+					s.Store(geohash.Neighbor(key.(string), d), true)
 					wg.Done()
 				}()
 				wg.Wait()
 			}
-		}
+			return true
+		})
 	}
 
-	out := make([]string, 0, len(s))
-	for k := range s {
-		out = append(out, k)
-	}
+	out := make([]string, 0)
+	s.Range(func(key, value any) bool {
+		out = append(out, key.(string))
+		return true
+	})
 
 	return out
 }

@@ -18,6 +18,7 @@ resource "aws_lambda_function" "providerupdate_lambda" {
         REGION = var.deployment_region        
         TABLE_NAME = aws_dynamodb_table.lymphly-table.name
         LOG_LEVEL = "INFO"
+        RADAR_PRIVATE_KEY = var.radar_secret_key
       }
     }
 }
