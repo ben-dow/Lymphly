@@ -176,6 +176,7 @@ func LocatePracticeByState(w http.ResponseWriter, r *http.Request) {
 }
 
 func LocatePractice(w http.ResponseWriter, r *http.Request) {
+	
 	/// Query Parameters
 	// lat, long
 	// addr

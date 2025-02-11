@@ -8,6 +8,7 @@ resource "aws_lambda_function" "providersearch_lambda" {
     role = aws_iam_role.lambda_execute_role.arn
     runtime = "provided.al2023"
     handler = "bootstrap"
+    timeout = 10
     architectures = [ "x86_64" ]
     source_code_hash = filemd5("${var.releases_path}/providersearch_lambda_x86_64.zip")
     environment {
