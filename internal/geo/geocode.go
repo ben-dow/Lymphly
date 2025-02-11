@@ -115,7 +115,7 @@ func Neighbors(hash string, depth int) []string {
 	out := []string{}
 	if depth > 0 {
 		for _, h := range hashes {
-			out = append(out, Neighbors(h, depth)...)
+			out = append(out, Neighbors(h, depth-1)...)
 		}
 	}
 
