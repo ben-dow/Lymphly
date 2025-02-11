@@ -36,11 +36,6 @@ resource "aws_iam_policy" "lambda_execution_policy" {
 data "aws_iam_policy_document" "lambda_execute_policy" {
     statement {
         effect = "Allow"
-        actions = ["ssm:GetParameter", "ssm:GetParametersByPath"]
-        resources = [ aws_ssm_parameter.radarSecret.arn  ]
-    }
-    statement {
-        effect = "Allow"
         actions = [
                 "dynamodb:BatchGetItem",
                 "dynamodb:BatchWriteItem",
