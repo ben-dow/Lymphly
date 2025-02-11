@@ -7,6 +7,7 @@ import (
 	"lymphly/internal/cfg"
 	"net/http"
 	"net/url"
+	"sync"
 
 	"github.com/mmcloughlin/geohash"
 	"github.com/umahmood/haversine"
@@ -110,14 +111,32 @@ func InRadius(originLat, originLong, destLat, destLong float64, radiusMi int) bo
 }
 
 func Neighbors(hash string, depth int) []string {
+
 	s := map[string]bool{
 		hash: true,
 	}
 
+	directions := []geohash.Direction{
+		geohash.North,
+		geohash.NorthEast,
+		geohash.East,
+		geohash.SouthEast,
+		geohash.South,
+		geohash.SouthWest,
+		geohash.West,
+		geohash.NorthWest,
+	}
+
+	wg := sync.WaitGroup{}
 	for i := depth; i >= 0; i-- {
 		for k := range s {
-			for _, h := range geohash.Neighbors(k) {
-				s[h] = true
+			for _, d := range directions {
+				wg.Add(1)
+				go func() {
+					s[geohash.Neighbor(k, d)] = true
+					wg.Done()
+				}()
+				wg.Wait()
 			}
 		}
 	}
