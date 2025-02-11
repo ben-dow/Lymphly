@@ -110,14 +110,22 @@ func InRadius(originLat, originLong, destLat, destLong float64, radiusMi int) bo
 }
 
 func Neighbors(hash string, depth int) []string {
-	hashes := geohash.Neighbors(hash)
+	s := map[string]bool{
+		hash: true,
+	}
 
-	out := []string{}
-	if depth > 0 {
-		for _, h := range hashes {
-			out = append(out, Neighbors(h, depth-1)...)
+	for i := depth; i >= 0; i-- {
+		for k := range s {
+			for _, h := range geohash.Neighbors(k) {
+				s[h] = true
+			}
 		}
 	}
 
-	return append(hashes, out...)
+	out := make([]string, 0, len(s))
+	for k := range s {
+		out = append(out, k)
+	}
+
+	return out
 }

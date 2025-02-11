@@ -18,6 +18,7 @@ resource "aws_lambda_function" "providersearch_lambda" {
         ENV_NAME = var.environment_name
         REGION = var.deployment_region
         TABLE_NAME = aws_dynamodb_table.lymphly-table.name
+        LOG_LEVEL = "INFO"
       }
     }
 }

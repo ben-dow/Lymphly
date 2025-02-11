@@ -50,6 +50,7 @@ type Config struct {
 	Region          string `env:"REGION"`
 	TableName       string `env:"TABLE_NAME"`
 	BasePath        string `env:"BASE_PATH"`
+	LogLevel        string `env:"LOG_LEVEL"`
 	RadarPrivateKey string
 	Version         string
 }
