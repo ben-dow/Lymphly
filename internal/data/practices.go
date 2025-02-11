@@ -264,11 +264,11 @@ func GetPracticesByProximity(ctx context.Context, lat, long float64, radius int)
 	originHash := geohash.EncodeWithPrecision(lat, long, 4)
 
 	depth := 0
-	if radius < 20 {
+	if radius <= 20 {
 		depth = 1
-	} else if radius < 50 {
+	} else if radius <= 50 {
 		depth = 2
-	} else if radius < 100 {
+	} else if radius <= 100 {
 		depth = 5
 	} else {
 		return nil, errors.New("cant do more than 100 miles")
