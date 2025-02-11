@@ -196,9 +196,17 @@ func EnumeratePracticesByState(ctx context.Context, stateCode string) ([]Practic
 	return out, nil
 }
 
-func EnumeratePracticesByGeoHash(ctx context.Context, hash string) ([]Practice, error) {
-	keyCond := expression.Key("pk").Equal(expression.Value(PracticeGeoHashPkPrefix + hash))
-	expr, _ := expression.NewBuilder().WithKeyCondition(keyCond).Build()
+func EnumeratePracticesByGeoHash(ctx context.Context, hashes []string) ([]Practice, error) {
+	keyCond := expression.Key("pk").Equal(expression.Value(PracticesPk))
+
+	hashValues := make([]expression.OperandBuilder, len(hashes))
+
+	for idx, h := range hashes {
+		hashValues[idx] = expression.Value(h)
+	}
+	cond := expression.Name("GeoHash").In(hashValues[0], hashValues[1:]...)
+
+	expr, _ := expression.NewBuilder().WithKeyCondition(keyCond).WithCondition(cond).Build()
 
 	paginator := dynamodb.NewQueryPaginator(db, &dynamodb.QueryInput{
 		TableName:                 aws.String(cfg.Cfg().TableName),
@@ -234,41 +242,19 @@ func EnumeratePracticesByGeoHash(ctx context.Context, hash string) ([]Practice, 
 func GetPracticesByProximity(ctx context.Context, lat, long float64, radius int) ([]Practice, error) {
 	originHash := geohash.EncodeWithPrecision(lat, long, 4)
 
-	neighborMap := map[string][]Practice{}
 	hashes := geo.Neighbors(originHash, (radius/10)+1)
-	for _, h := range hashes {
-		if _, ok := neighborMap[h]; !ok {
-			neighborMap[h] = []Practice{}
-		}
-	}
 
-	prs := []Practice{}
-
-	execgroup := new(errgroup.Group)
-
-	for h := range neighborMap {
-		execgroup.Go(func() error {
-			practices, err := EnumeratePracticesByGeoHash(ctx, h)
-			if err != nil {
-				return err
-			}
-
-			out := []Practice{}
-			for _, p := range practices {
-				if geo.InRadius(lat, long, p.Lattitude, p.Longitude, radius) {
-					out = append(out, p)
-				}
-			}
-
-			neighborMap[h] = append(prs, out...)
-			return nil
-		})
-	}
-
-	err := execgroup.Wait()
+	practices, err := EnumeratePracticesByGeoHash(ctx, hashes)
 	if err != nil {
 		return nil, err
 	}
 
-	return prs, nil
+	out := []Practice{}
+	for _, p := range practices {
+		if geo.InRadius(lat, long, p.Lattitude, p.Longitude, radius) {
+			out = append(out, p)
+		}
+	}
+
+	return out, nil
 }
