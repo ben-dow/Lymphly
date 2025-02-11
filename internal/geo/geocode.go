@@ -7,7 +7,6 @@ import (
 	"lymphly/internal/cfg"
 	"net/http"
 	"net/url"
-	"sync"
 
 	"github.com/mmcloughlin/geohash"
 	"github.com/umahmood/haversine"
@@ -96,7 +95,7 @@ func GeocodeAddress(addr string) (*GeocodeResponse, error) {
 	return out, nil
 }
 
-func InRadius(originLat, originLong, destLat, destLong float64, radiusMi int) bool {
+func InRadius(originLat, originLong, destLat, destLong float64, radiusMi int) (float64, bool) {
 	mi, _ := haversine.Distance(
 		haversine.Coord{
 			Lat: originLat,
@@ -107,13 +106,13 @@ func InRadius(originLat, originLong, destLat, destLong float64, radiusMi int) bo
 			Lon: destLong,
 		})
 
-	return mi <= float64(radiusMi)
+	return mi, mi <= float64(radiusMi)
 }
 
 func Neighbors(hash string, depth int) []string {
 
-	s := sync.Map{}
-	s.Store(hash, true)
+	s := map[string]bool{}
+	s[hash] = false
 
 	directions := []geohash.Direction{
 		geohash.North,
@@ -126,26 +125,21 @@ func Neighbors(hash string, depth int) []string {
 		geohash.NorthWest,
 	}
 
-	wg := sync.WaitGroup{}
 	for i := depth; i >= 0; i-- {
-		s.Range(func(key, value any) bool {
-			for _, d := range directions {
-				wg.Add(1)
-				go func() {
-					s.Store(geohash.Neighbor(key.(string), d), true)
-					wg.Done()
-				}()
-				wg.Wait()
+		for k, v := range s {
+			if !v {
+				for _, d := range directions {
+					s[geohash.Neighbor(k, d)] = false
+				}
+				s[k] = true
 			}
-			return true
-		})
+		}
 	}
 
-	out := make([]string, 0)
-	s.Range(func(key, value any) bool {
-		out = append(out, key.(string))
-		return true
-	})
+	out := make([]string, 0, len(s))
+	for k := range s {
+		out = append(out, k)
+	}
 
 	return out
 }

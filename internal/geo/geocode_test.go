@@ -1,7 +1,11 @@
 package geo
 
-import "testing"
+import (
+	"testing"
+)
 
-func TestNeighbors(t *testing.T) {
-	Neighbors("dry1", 20)
+func BenchmarkNeighbors(b *testing.B) {
+	for n := 0; n < b.N; n++ {
+		Neighbors("dry1", 5)
+	}
 }

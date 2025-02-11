@@ -263,7 +263,18 @@ func EnumeratePracticesByGeoHash(ctx context.Context, hashes []string) ([]Practi
 func GetPracticesByProximity(ctx context.Context, lat, long float64, radius int) ([]Practice, error) {
 	originHash := geohash.EncodeWithPrecision(lat, long, 4)
 
-	hashes := geo.Neighbors(originHash, (radius/10)+1)
+	depth := 0
+	if radius < 20 {
+		depth = 1
+	} else if radius < 50 {
+		depth = 2
+	} else if radius < 100 {
+		depth = 5
+	} else {
+		return nil, errors.New("cant do more than 100 miles")
+	}
+
+	hashes := geo.Neighbors(originHash, depth)
 
 	practices, err := EnumeratePracticesByGeoHash(ctx, hashes)
 	if err != nil {
@@ -276,7 +287,7 @@ func GetPracticesByProximity(ctx context.Context, lat, long float64, radius int)
 	for _, p := range practices {
 		wg.Add(1)
 		go func() {
-			if geo.InRadius(lat, long, p.Lattitude, p.Longitude, radius) {
+			if _, in := geo.InRadius(lat, long, p.Lattitude, p.Longitude, radius); in {
 				mu.Lock()
 				out = append(out, p)
 				mu.Unlock()
