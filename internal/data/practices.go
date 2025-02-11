@@ -206,7 +206,7 @@ func EnumeratePracticesByGeoHash(ctx context.Context, hashes []string) ([]Practi
 	}
 	cond := expression.Name("GeoHash").In(hashValues[0], hashValues[1:]...)
 
-	expr, _ := expression.NewBuilder().WithKeyCondition(keyCond).WithCondition(cond).Build()
+	expr, _ := expression.NewBuilder().WithKeyCondition(keyCond).WithFilter(cond).Build()
 
 	paginator := dynamodb.NewQueryPaginator(db, &dynamodb.QueryInput{
 		TableName:                 aws.String(cfg.Cfg().TableName),
