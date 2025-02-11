@@ -5,6 +5,7 @@ import (
 	"errors"
 	"lymphly/internal/cfg"
 	"lymphly/internal/geo"
+	"sync"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue"
@@ -197,46 +198,66 @@ func EnumeratePracticesByState(ctx context.Context, stateCode string) ([]Practic
 }
 
 func EnumeratePracticesByGeoHash(ctx context.Context, hashes []string) ([]Practice, error) {
-	keyCond := expression.Key("pk").Equal(expression.Value(PracticesPk))
 
-	hashValues := make([]expression.OperandBuilder, len(hashes))
+	resMu := sync.Mutex{}
+	outResults := []Practice{}
+	execGroup := new(errgroup.Group)
 
-	for idx, h := range hashes {
-		hashValues[idx] = expression.Value(h)
+	for i := 0; i < len(hashes); i += 100 {
+		execGroup.Go(func() error {
+			end := i + 100
+			if end > len(hashes) {
+				end = len(hashes)
+			}
+			hashChunk := hashes[i:end]
+			keyCond := expression.Key("pk").Equal(expression.Value(PracticesPk))
+			hashValues := make([]expression.OperandBuilder, len(hashChunk))
+			for idx, h := range hashChunk {
+				hashValues[idx] = expression.Value(h)
+			}
+			cond := expression.Name("GeoHash").In(hashValues[0], hashValues[1:]...)
+
+			expr, _ := expression.NewBuilder().WithKeyCondition(keyCond).WithFilter(cond).Build()
+
+			paginator := dynamodb.NewQueryPaginator(db, &dynamodb.QueryInput{
+				TableName:                 aws.String(cfg.Cfg().TableName),
+				KeyConditionExpression:    expr.KeyCondition(),
+				FilterExpression:          expr.Filter(),
+				ProjectionExpression:      expr.Projection(),
+				ExpressionAttributeNames:  expr.Names(),
+				ExpressionAttributeValues: expr.Values(),
+			})
+
+			results := []map[string]types.AttributeValue{}
+			for paginator.HasMorePages() {
+				res, err := paginator.NextPage(ctx)
+				if err != nil {
+					return err
+				}
+				results = append(results, res.Items...)
+			}
+
+			for _, r := range results {
+				res := Practice{}
+				err := attributevalue.UnmarshalMap(r, &res)
+				if err != nil {
+					return err
+				}
+				resMu.Lock()
+				outResults = append(outResults, res)
+				resMu.Unlock()
+			}
+
+			return nil
+		})
 	}
-	cond := expression.Name("GeoHash").In(hashValues[0], hashValues[1:]...)
 
-	expr, _ := expression.NewBuilder().WithKeyCondition(keyCond).WithFilter(cond).Build()
-
-	paginator := dynamodb.NewQueryPaginator(db, &dynamodb.QueryInput{
-		TableName:                 aws.String(cfg.Cfg().TableName),
-		KeyConditionExpression:    expr.KeyCondition(),
-		FilterExpression:          expr.Filter(),
-		ProjectionExpression:      expr.Projection(),
-		ExpressionAttributeNames:  expr.Names(),
-		ExpressionAttributeValues: expr.Values(),
-	})
-
-	results := []map[string]types.AttributeValue{}
-	for paginator.HasMorePages() {
-		res, err := paginator.NextPage(ctx)
-		if err != nil {
-			return nil, err
-		}
-		results = append(results, res.Items...)
+	err := execGroup.Wait()
+	if err != nil {
+		return nil, err
 	}
 
-	out := make([]Practice, len(results))
-	for idx, r := range results {
-		res := Practice{}
-		err := attributevalue.UnmarshalMap(r, &res)
-		if err != nil {
-			return nil, err
-		}
-		out[idx] = res
-	}
-
-	return out, nil
+	return outResults, nil
 }
 
 func GetPracticesByProximity(ctx context.Context, lat, long float64, radius int) ([]Practice, error) {
@@ -249,11 +270,17 @@ func GetPracticesByProximity(ctx context.Context, lat, long float64, radius int)
 		return nil, err
 	}
 
+	mu := sync.Mutex{}
 	out := []Practice{}
 	for _, p := range practices {
-		if geo.InRadius(lat, long, p.Lattitude, p.Longitude, radius) {
-			out = append(out, p)
-		}
+		go func() {
+			if geo.InRadius(lat, long, p.Lattitude, p.Longitude, radius) {
+				mu.Lock()
+				out = append(out, p)
+				mu.Unlock()
+			}
+		}()
+
 	}
 
 	return out, nil
