@@ -6,6 +6,7 @@ import (
 	"errors"
 	"lymphly/internal/data"
 	"lymphly/internal/geo"
+	"lymphly/internal/log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -236,6 +237,7 @@ func LocatePractice(w http.ResponseWriter, r *http.Request) {
 execute:
 	practices, err := data.GetPracticesByProximity(r.Context(), lat, long, radiusMi)
 	if err != nil {
+		log.Error("failed to query practices by proximity", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
