@@ -83,8 +83,8 @@ export function Map(props: MapProps){
       }, [practiceList, map]);
 
       return(
-        <Box className='w-full h-full'>
-            <div id="map" className="w-full h-87 rounded-2xl"/>
+        <Box className='w-6xl h-150'>
+            <div id="map" className="w-full h-full max-h-150 rounded-2xl"/>
         </Box>        
       )
 }

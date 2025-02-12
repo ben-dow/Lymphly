@@ -1,4 +1,4 @@
-import {Box, Tabs, Text} from '@mantine/core'
+import {Box, Divider, Tabs, Text} from '@mantine/core'
 import 'radar-sdk-js/dist/radar.css'
 import { useEffect, useState } from 'react';
 import { PracticeListI } from '../model/practice';
@@ -29,30 +29,34 @@ function SearchContainer(){
     }, [])
 
     return(
-        <Box className={"bg-emerald-100 p-5 flex flex-col gap-10 shadow-sm w-full xl:w-1/2 rounded-xl"}>
+        <Box className={"bg-sky-200 p-5 flex flex-col gap-5 shadow-sm w-full "}>
             <Box className="text-center">
-                <Text size="xl" fw={700}>Find A Provider By:</Text>
+                <h2 className='text-3xl font-normal font-sans'>Find a Provider</h2>
+            </Box>
+            <Box className='flex flex-row flex-wrap justify-center gap-5'>
+                <Box className='h-20 w-50 bg-emerald-900 flex flex-col justify-center text-center shadow-sm hover:shadow-xl hover:cursor-pointer'>
+                    <Text c="white" fw={700} size={"lg"}>By Current Location</Text>
+                </Box>
+
+                <Box className='h-20 w-50 bg-emerald-900 flex flex-col justify-center text-center shadow-sm hover:shadow-xl hover:cursor-pointer'>
+                    <Text c="white" fw={700} size={"lg"}>By Address</Text>
+                </Box>
+
+                <Box className='h-20 w-50 bg-emerald-900 flex flex-col justify-center text-center shadow-sm hover:shadow-xl hover:cursor-pointer'>
+                    <Text c="white" fw={700} size={"lg"}>By State</Text>
+                </Box>
             </Box>
 
             <Box className='flex flex-row flex-wrap justify-center gap-5'>
-                <Box className='rounded-xl h-36 w-36 bg-emerald-800 flex flex-col justify-center text-center shadow-sm hover:shadow-xl hover:cursor-pointer'>
-                    <Text c="white" fw={700} size={"lg"}>Current Location</Text>
-                </Box>
-
-                <Box className='rounded-xl h-36 w-36 bg-emerald-800 flex flex-col justify-center text-center shadow-sm hover:shadow-xl hover:cursor-pointer'>
-                    <Text c="white" fw={700} size={"lg"}>State</Text>
-                </Box>
-
-                <Box className='rounded-xl h-36 w-36 bg-emerald-800 flex flex-col justify-center text-center shadow-sm hover:shadow-xl hover:cursor-pointer'>
-                    <Text c="white" fw={700} size={"lg"}>City</Text>
-                </Box>
-
-                <Box className='rounded-xl h-36 w-36 bg-emerald-800 flex flex-col justify-center text-center shadow-sm hover:shadow-xl hover:cursor-pointer'>
-                    <Text c="white" fw={700} size={"lg"}>Practice</Text>
+                <Divider className={"w-full max-w-2xl"} color={"black"}/>
+            </Box>
+            <Box className='flex flex-row flex-wrap justify-center gap-5'>
+                <Box className='h-20 w-50 bg-emerald-900 flex flex-col justify-center text-center shadow-sm hover:shadow-xl hover:cursor-pointer'>
+                    <Text c="white" fw={700} size={"lg"}>Browse</Text>
                 </Box>
             </Box>
 
-            <Box>
+            <Box className='flex justify-center'>
                 <Map practiceList={practices}/>
             </Box>
 

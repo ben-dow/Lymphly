@@ -7,9 +7,13 @@ import "./App.css"
 export default function App() {
   return (
     <AppShell
+      withBorder={false}
       header={{ height: 100 }}
       padding="md"
-      className="bg-emerald-50"
+      className="bg-sky-950"
+      footer={{
+        height: 100
+      }}
     >
       <AppShell.Header>
         <Header/>
