@@ -31,7 +31,7 @@ type LimitedPracticeItem struct {
 	Longitude  float64 `json:"longitude"`
 }
 
-type AllPracticesResponse struct {
+type LimitedPracticeList struct {
 	Practices []LimitedPracticeItem `json:"practices"`
 }
 
@@ -42,7 +42,7 @@ func AllPractices(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response := &AllPracticesResponse{
+	response := &LimitedPracticeList{
 		Practices: make([]LimitedPracticeItem, len(d)),
 	}
 
@@ -148,10 +148,6 @@ func GetPracticeByProvider(w http.ResponseWriter, r *http.Request) {
 	w.Write(practiceBytes)
 }
 
-type EnumeratedPractices struct {
-	Practices []data.Practice `json:"practices"`
-}
-
 func LocatePracticeByState(w http.ResponseWriter, r *http.Request) {
 	stateCode := chi.URLParam(r, "stateCode")
 	if stateCode == "" {
@@ -166,8 +162,17 @@ func LocatePracticeByState(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	resp := &EnumeratedPractices{
-		Practices: practices,
+	resp := &LimitedPracticeList{
+		Practices: make([]LimitedPracticeItem, len(practices)),
+	}
+
+	for idx, p := range practices {
+		resp.Practices[idx] = LimitedPracticeItem{
+			PracticeId: p.PracticeId,
+			Name:       p.Name,
+			Lattitude:  p.Lattitude,
+			Longitude:  p.Longitude,
+		}
 	}
 
 	outBytes, _ := json.Marshal(resp)
@@ -176,7 +181,7 @@ func LocatePracticeByState(w http.ResponseWriter, r *http.Request) {
 }
 
 func LocatePractice(w http.ResponseWriter, r *http.Request) {
-	
+
 	/// Query Parameters
 	// lat, long
 	// addr
@@ -243,8 +248,17 @@ execute:
 		return
 	}
 
-	resp := &EnumeratedPractices{
-		Practices: practices,
+	resp := &LimitedPracticeList{
+		Practices: make([]LimitedPracticeItem, len(practices)),
+	}
+
+	for idx, p := range practices {
+		resp.Practices[idx] = LimitedPracticeItem{
+			PracticeId: p.PracticeId,
+			Name:       p.Name,
+			Lattitude:  p.Lattitude,
+			Longitude:  p.Longitude,
+		}
 	}
 
 	outBytes, _ := json.Marshal(resp)

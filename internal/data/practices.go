@@ -53,44 +53,17 @@ func PutPractice(ctx context.Context, name, address, phone, website, tags string
 		Website:     website,
 	}
 
-	execgroup := new(errgroup.Group)
-
 	// Save Practice Record
-	execgroup.Go(func() error {
-		practiceRecord := &PracticeRecord{
-			PrimaryKey: NewPracticePrimaryKey(practiceId),
-			Practice:   practice,
-		}
-		marshaledRecord, _ := attributevalue.MarshalMap(practiceRecord)
-		_, err = db.PutItem(ctx, &dynamodb.PutItemInput{
-			TableName: &cfg.Cfg().TableName,
-			Item:      marshaledRecord,
-		})
-		if err != nil {
-			return err
-		}
-		return nil
+	practiceRecord := &PracticeRecord{
+		PrimaryKey: NewPracticePrimaryKey(practiceId),
+		Practice:   practice,
+	}
+	marshaledRecord, _ := attributevalue.MarshalMap(practiceRecord)
+	_, err = db.PutItem(ctx, &dynamodb.PutItemInput{
+		TableName: &cfg.Cfg().TableName,
+		Item:      marshaledRecord,
 	})
 
-	// Save Practice Geohash Record
-	execgroup.Go(func() error {
-		practiceRecord := &PracticeGeoHashRecord{
-			PrimaryKey: NewPracticeGeoHashPrimaryKey(practice.GeoHash, practiceId),
-			Practice:   practice,
-		}
-		marshaledRecord, _ := attributevalue.MarshalMap(practiceRecord)
-		_, err = db.PutItem(ctx, &dynamodb.PutItemInput{
-			TableName: &cfg.Cfg().TableName,
-			Item:      marshaledRecord,
-		})
-		if err != nil {
-			return err
-		}
-		return nil
-	})
-
-	// Wait for saving to database to complete
-	err = execgroup.Wait()
 	if err != nil {
 		return nil, err
 	}

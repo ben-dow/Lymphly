@@ -34,7 +34,7 @@ func NewProviderPrimaryKey(providerId string) *PrimaryKey {
 }
 
 func DeriveProviderId(name, practiceId string) string {
-	h := sha3.New512()
+	h := sha3.New256()
 	hashInput := fmt.Sprintf("%s-%s", name, practiceId)
 	h.Write([]byte(hashInput))
 	providerId := base64.URLEncoding.EncodeToString(h.Sum(nil))
@@ -54,8 +54,7 @@ type ProviderRecord struct {
 }
 
 const (
-	PracticesPk             string = "practices"
-	PracticeGeoHashPkPrefix string = "practicehash#"
+	PracticesPk string = "practices"
 )
 
 func NewPracticePrimaryKey(practiceId string) *PrimaryKey {
@@ -65,15 +64,8 @@ func NewPracticePrimaryKey(practiceId string) *PrimaryKey {
 	}
 }
 
-func NewPracticeGeoHashPrimaryKey(geoHash string, practiceId string) *PrimaryKey {
-	return &PrimaryKey{
-		PartitionKey: fmt.Sprintf("%s%s", PracticeGeoHashPkPrefix, geoHash),
-		SortKey:      practiceId,
-	}
-}
-
 func DerivePracticeId(name, address string) string {
-	h := sha3.New512()
+	h := sha3.New256()
 	hashInput := fmt.Sprintf("%s-%s", name, address)
 	h.Write([]byte(hashInput))
 	practiceId := base64.URLEncoding.EncodeToString(h.Sum(nil))
@@ -97,11 +89,6 @@ type Practice struct {
 }
 
 type PracticeRecord struct {
-	*PrimaryKey
-	*Practice
-}
-
-type PracticeGeoHashRecord struct {
 	*PrimaryKey
 	*Practice
 }
