@@ -1,11 +1,12 @@
-import { Routes, Route } from 'react-router'
-import Search from '../../pages/search'
+import { Routes, Route, Navigate } from 'react-router'
+import Search from '../../pages/search/search'
 
 export default function Body(){
     return(
-      <div className=''>
+      <div className='h-full w-full'>
         <Routes>
-          <Route path="/" element={<Search/>}/>
+        <Route index element={ <Navigate to="/search" /> } />
+          <Route path="/search" element={<Search/>}/>
         </Routes>
       </div>
     )

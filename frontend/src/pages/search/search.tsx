@@ -1,24 +1,25 @@
 import {Box, Divider, Tabs, Text} from '@mantine/core'
 import 'radar-sdk-js/dist/radar.css'
 import { useEffect, useState } from 'react';
-import { PracticeListI } from '../model/practice';
-import { DataDisplay, Map } from '../components/search/display';
+import { PracticeListI } from '../../model/practice';
+import { DataDisplay, Map } from '../../components/search/display';
+import { Routes, Route } from 'react-router';
 
 
 export default function Search(){
 
     return(
         <div className="w-full h-full flex justify-center">
-            <SearchContainer/>
+            <Box className={"bg-sky-200 p-5 shadow-sm w-full h-full"}>
+                <Routes>
+                    <Route path="/" element={<SearchHome/>}/>
+                </Routes>
+            </Box>
         </div>
     )
 }
 
-
-
-
-function SearchContainer(){
-
+function SearchHome(){
     const [practices, setPractices] = useState<PracticeListI>({practices:[]})
 
     useEffect(() => {
@@ -29,7 +30,7 @@ function SearchContainer(){
     }, [])
 
     return(
-        <Box className={"bg-sky-200 p-5 flex flex-col gap-5 shadow-sm w-full "}>
+        <Box className="flex flex-col gap-5">
             <Box className="text-center">
                 <h2 className='text-3xl font-normal font-sans'>Find a Provider</h2>
             </Box>
