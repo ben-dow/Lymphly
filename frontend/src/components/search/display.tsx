@@ -1,7 +1,7 @@
 import { Box, Table, Tabs } from "@mantine/core";
 import Radar from "radar-sdk-js";
 import RadarMap from "radar-sdk-js/dist/ui/RadarMap";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { LimitedPracticePracticeListI as LimitedPracticesListI, PracticeListI as PracticeListI } from "../../model/practice";
 
 
@@ -11,15 +11,15 @@ interface DataDisplayProps {
 
 export function DataDisplay(props:DataDisplayProps) {
     return (
-            <Tabs defaultValue={"Map"} className="w-full h-96 shadow-sm  rounded-2xl">
-                <Tabs.List>
-                    <Tabs.Tab value="Map">Map</Tabs.Tab>
-                    <Tabs.Tab value="Practices">Practices</Tabs.Tab>
+            <Tabs defaultValue={"Map"} className="rounded-2xl w-6xl h-150">
+                <Tabs.List className="bg-cyan-700 rounded-t-xl">
+                    <Tabs.Tab value="Map"><h1 className="font-sans text-white font-medium">Map</h1></Tabs.Tab>
+                    <Tabs.Tab value="Map"><h1 className="font-sans text-white font-medium">Practices</h1></Tabs.Tab>
                 </Tabs.List>
-                <Tabs.Panel value="Map" className='h-full'>
+                <Tabs.Panel value="Map" className='flex justify-center w-full h-full'>
                     <Map {...props}/>
                 </Tabs.Panel>
-                <Tabs.Panel value="Practices" className='h-full'>
+                <Tabs.Panel value="Practices" className='h-full w-full'>
                     <PracticeTable {...props}/>
                 </Tabs.Panel>
             </Tabs>
@@ -49,22 +49,38 @@ interface MapProps{
     practiceList: LimitedPracticesListI
 }
 
+function useRadar() {
+    const [initialized, setInitialized] = useState(false)
+
+    const initialize = useCallback(()=>{
+        fetch("/radar_pub_key.txt").then((r) =>r.text()).then(text=>{
+            Radar.initialize(text);
+            setInitialized(true);
+        })
+    }, [])
+
+    useEffect(()=>{
+        initialize()    
+    },[])
+    
+    return initialized
+}
+
 export function Map(props: MapProps){
+    let initialized = useRadar()
     const [map, setMap] = useState<RadarMap>()
     const practiceList = props.practiceList.practices
 
     useEffect(() => {
-        fetch("/radar_pub_key.txt").then((r) =>r.text()).then(text=>{
-            Radar.initialize(text);
+        if (initialized){
             const Map = Radar.ui.map({
                 container: "map",
-                center: [-98.5556199, 39.8097343],
                 zoom: 1,
+                
             })
             setMap(Map)
-        })
-
-    }, [])
+        }
+    }, [initialized])
 
     useEffect(() => {
         if (map != undefined){
@@ -72,19 +88,19 @@ export function Map(props: MapProps){
             for (let index = 0; index < practiceList.length; index++) {
                 const element = practiceList[index];
                 Radar.ui.marker({
-                    color: '#000257',
+                    color: 'red',
                     scale: .5,
                     popup: {
                         text: element.name
-                    }
+                    },
+                    zoom: 1,
                 }).setLngLat([element.longitude, element.lattitude]).addTo(map)
             }
+            map.fitToMarkers()
         }
       }, [practiceList, map]);
 
       return(
-        <Box className='w-6xl h-150'>
-            <div id="map" className="w-full h-full max-h-150 rounded-2xl"/>
-        </Box>        
+        <div id="map" className="w-full h-full rounded-b-2xl"/>
       )
 }

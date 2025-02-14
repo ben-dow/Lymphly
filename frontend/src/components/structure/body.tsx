@@ -6,7 +6,7 @@ export default function Body(){
       <div className='h-full w-full'>
         <Routes>
         <Route index element={ <Navigate to="/search" /> } />
-          <Route path="/search" element={<Search/>}/>
+          <Route path="/search/*" element={<Search/>}/>
         </Routes>
       </div>
     )
