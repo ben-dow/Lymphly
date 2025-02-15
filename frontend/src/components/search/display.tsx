@@ -92,8 +92,7 @@ export function Map(props: MapProps){
                     scale: .5,
                     popup: {
                         text: element.name
-                    },
-                    zoom: 1,
+                    }
                 }).setLngLat([element.longitude, element.lattitude]).addTo(map)
             }
             map.fitToMarkers()
