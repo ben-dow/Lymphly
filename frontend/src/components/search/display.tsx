@@ -61,7 +61,7 @@ export function Map(props: DataDisplayProps){
     useEffect(() => {
         if (map === undefined){
             fetch("/radar_pub_key.txt").then((r) =>r.text()).then(text=>{
-                Radar.initialize(text);
+                Radar.initialize(text, {debug: false});
                 const Map = Radar.ui.map({
                     container: "map",
                     zoom: 0,
@@ -121,6 +121,8 @@ export function Map(props: DataDisplayProps){
                     }
                 })
                 map.fitToFeatures()
+            } else {
+                map.clearFeatures()
             }
 
             map.redraw()

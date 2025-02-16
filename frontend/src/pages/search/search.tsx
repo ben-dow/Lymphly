@@ -9,7 +9,7 @@ import { Routes, Route, Router, useNavigate } from 'react-router';
 export default function Search(){
     const [dataDisplayProps, setDataDisplayProps] = useState<DataDisplayProps>({})
 
-    useEffect(() => {
+    const setGlobal = ()=>{
         fetch("/api/v1/providersearch/practices/all").then((r) =>r.json()).then(j=>{
             const pl: PracticeListI = j
             setDataDisplayProps({
@@ -19,12 +19,16 @@ export default function Search(){
                 }
             })
         })
+    }
+
+    useEffect(() => {
+        setGlobal()
     }, [])
     let navigate = useNavigate()
 
     return(
         <Box className={"bg-sky-200 p-5 shadow-sm w-full h-full flex flex-col gap-5"}>
-            <div className='w-20 items-center flex justify-center h-10 hover:cursor-pointer bg-sky-900 rounded text-white font-sans font-semibold hover:shadow-md hover:bg-sky-800' hidden={window.location.pathname == "/search"} onClick={()=>{navigate("/search")}}>
+            <div className='w-20 items-center flex justify-center h-10 hover:cursor-pointer bg-sky-900 rounded text-white font-sans font-semibold hover:shadow-md hover:bg-sky-800' hidden={window.location.pathname == "/search"} onClick={()=>{navigate("/search"); setGlobal()}}>
                 Back
             </div>
             <Routes>
