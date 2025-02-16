@@ -40,7 +40,7 @@ export default function Search(){
 }
 
 interface PracticeUpdaterI{
-    updateDataDisplayProps: Function
+    updateDataDisplayProps: (props: DataDisplayProps) => void
 }
 
 function SearchHome(){
@@ -90,7 +90,12 @@ function SearchByLocation(props:PracticeUpdaterI){
                 then(res => res.json()).
                 then((res)=>{props.updateDataDisplayProps(
                     {
-                        practices: res
+                        practiceList: res,
+                        mapConfiguration: {
+                            RadiusFeature: true,
+                            RadiusOrigin: [long, lat],
+                            Radius: 10
+                        }
                     }
                 )})
             

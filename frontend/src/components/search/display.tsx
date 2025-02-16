@@ -3,7 +3,8 @@ import Radar from "radar-sdk-js";
 import RadarMap from "radar-sdk-js/dist/ui/RadarMap";
 import { useCallback, useEffect, useState } from "react";
 import { LimitedPracticePracticeListI as LimitedPracticesListI, PracticeListI as PracticeListI } from "../../model/practice";
-import { LngLatBoundsLike, LngLatLike } from "maplibre-gl";
+import { LngLatBoundsLike, LngLatLike} from "maplibre-gl";
+import {Position} from "geojson"
 
 
 export interface DataDisplayProps {
@@ -49,47 +50,94 @@ export function PracticeTable(props: DataDisplayProps){
 
 
 interface MapConfiguration {
-    LocationMarker?: LngLatLike
+    RadiusOrigin?: LngLatLike
     RadiusFeature?: boolean
     Radius?: number
 }
 
 export function Map(props: DataDisplayProps){
-    const [map, setMap] = useState<RadarMap>()
+    const [map, setMap] = useState<RadarMap>(undefined)
 
     useEffect(() => {
             fetch("/radar_pub_key.txt").then((r) =>r.text()).then(text=>{
                 Radar.initialize(text);
                 const Map = Radar.ui.map({
                     container: "map",
-                    zoom: 2
+                    zoom:0,
                 })
                 setMap(Map)
             })
     }, [])
 
     useEffect(() => {
-        if (map != undefined && props.practiceList != undefined ){
-            map.clearMarkers()
-            for (let index = 0; index < props.practiceList.practices.length; index++) {
-                const element = props.practiceList.practices[index];
-                Radar.ui.marker({
-                    color: 'red',
-                    scale: .5,
-                    popup: {
-                        text: element.name
-                    },
-                }).setLngLat([element.longitude, element.lattitude]).addTo(map)
-                map.fitToMarkers()
+        if (map != undefined){
+            if (props.practiceList != undefined){
+                map.clearMarkers()
+                for (let index = 0; index < props.practiceList.practices.length; index++) {
+                    const element = props.practiceList.practices[index];
+                    Radar.ui.marker({
+                        color: 'red',
+                        scale: .5,
+                        popup: {
+                            text: element.name
+                        },
+                    }).setLngLat([element.longitude, element.lattitude]).addTo(map)
+                    map.fitToMarkers()
+                }
             }
+ 
 
             if (props.mapConfiguration != undefined && props.mapConfiguration.RadiusFeature) {
+                Radar.ui.marker(
+                    {
+                        color: "blue",
+                        scale: .75,
+                    }
+                ).setLngLat(props.mapConfiguration.RadiusOrigin).addTo(map)
 
+                console.log(ZoneCoords(props.mapConfiguration.RadiusOrigin, props.mapConfiguration.Radius, 100))
+                map.addPolygon({
+                    type: "Feature",
+                    id: 1,
+                    properties: {
+                        name: "radius"
+                    },
+                    geometry: {
+                        type: "Polygon",
+                        coordinates:ZoneCoords(props.mapConfiguration.RadiusOrigin, props.mapConfiguration.Radius, 50)
+                    }
+                })
+                map.fitToFeatures()
             }
+
         }
       }, [props.practiceList, props.mapConfiguration, map]);
 
       return(
         <div id="map" style={{width: "1152px", height:600}} className="rounded-b-2xl"/>
       )
+}
+
+
+function ZoneCoords(lngLt: LngLatLike, radius: number, resolution: number): Position[][] {
+    const long = lngLt[0]
+    const lat = lngLt[1]
+
+    const radiusKm = radius / 0.621371;
+    const radiusLon = 1 / (111.319 * Math.cos(lat * (Math.PI / 180))) * radiusKm;
+    const radiusLat = 1 / 110.574 * radiusKm;
+    
+    const dTheta = 2 * Math.PI / resolution;
+    let theta = 0;
+
+    let out: Position[] = []
+
+    for (var i = 0; i < resolution; i++)
+    {
+        out.push([long + radiusLon + Math.cos(theta),lat + radiusLat + Math.sin(theta)]);
+        theta += dTheta;
+    }
+
+
+    return [out]
 }
