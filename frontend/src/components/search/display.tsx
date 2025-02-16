@@ -2,7 +2,7 @@ import { Box, Divider, Table, TableData, Tabs } from "@mantine/core";
 import Radar from "radar-sdk-js";
 import RadarMap from "radar-sdk-js/dist/ui/RadarMap";
 import { useCallback, useEffect, useState } from "react";
-import { LimitedPracticePracticeListI as LimitedPracticesListI, PracticeI, PracticeListI as PracticeListI } from "../../model/practice";
+import { LimitedPracticePracticeListI as LimitedPracticesListI, PracticeI, PracticeListI as PracticeListI, ProviderListI } from "../../model/practice";
 import { LngLatBoundsLike, LngLatLike} from "maplibre-gl";
 import {Position} from "geojson"
 
@@ -44,11 +44,16 @@ interface SelectedProps {
 function Selected(props:SelectedProps){
 
     const [practice, setPractice] = useState<PracticeI>()
+    const [providers, setProviders] = useState<ProviderListI>()
 
     useEffect(()=>{
         if (props.practiceId != ""){
             fetch("/api/v1/providersearch/practice/"+props.practiceId).then((r) =>r.json()).then(pr=>{
                 setPractice(pr)
+            })
+
+            fetch("/api/v1/providersearch/practice/"+props.practiceId+"/providers").then((r) =>r.json()).then(pr=>{
+                setProviders(pr)
             })
         }
 
@@ -60,38 +65,50 @@ function Selected(props:SelectedProps){
         )
     } else {
         let tableData: TableData = {
-            head: ["Name", "Address"],
+            head: ["Name", "Tags"],
             body: []
         }
 
-        tableData.body.push([practice.name])
-        tableData.body.push([practice.fullAddress])
+        for(let i = 0; i<providers.providers.length; i++){
+            tableData.body.push([providers.providers[i].name, providers.providers[i].tags])
+        }
 
         
 
         return (
-            <Box className="text-white overflow-hidden font-sans flex flex-col gap-5 p-6 w-full justify-center text-wrap">
-                <Box className="flex flex-row gap-2 justify-baseline flex-wrap">
-                    <Box className="text-sm w-20 font-medium">Name: </Box>
-                    <Box className="text-sm">{practice.name}</Box>
+            <Box className="p-5 flex flex-col gap-5">
+                <Box className="text-center font-sans text-2xl text-white font-medium">
+                        Practice Info
                 </Box>
-                <Box className="flex flex-row justify-baseline gap-2 flex-wrap">
-                    <Box className="text-sm font-medium w-20">Address: </Box>
-                    <Box className="text-sm">{practice.fullAddress}</Box>
+                <Box className="text-white border-white border overflow-hidden font-sans flex flex-col gap-5 p-6 w-full justify-center text-wrap">
+                   
+                    <Box className="flex flex-row gap-2 justify-baseline flex-wrap">
+                        <Box className="text-sm w-20 font-medium">Name: </Box>
+                        <Box className="text-sm">{practice.name}</Box>
+                    </Box>
+                    <Box className="flex flex-row justify-baseline gap-2 flex-wrap">
+                        <Box className="text-sm font-medium w-20">Address: </Box>
+                        <Box className="text-sm">{practice.fullAddress}</Box>
+                    </Box>
+                    <Box className="flex flex-row justify-baseline gap-2 flex-wrap">
+                        <Box className="text-sm font-medium w-20">Website: </Box>
+                        <Box className="text-sm"><a className="underline" href={practice.website}>{practice.website}</a></Box>
+                    </Box>
+                    <Box className="flex flex-row justify-baseline gap-2 flex-wrap">
+                        <Box className="text-sm font-medium w-20 ">Phone: </Box>
+                        <Box className="text-sm">{practice.phone}</Box>
+                    </Box>
+                    <Box className="flex flex-row justify-baseline gap-2 flex-wrap">
+                        <Box className="text-sm font-medium w-20">Tags: </Box>
+                        <Box className="text-sm">{practice.tags}</Box>
+                    </Box>
+                
                 </Box>
-                <Box className="flex flex-row justify-baseline gap-2 flex-wrap">
-                    <Box className="text-sm font-medium w-20">Website: </Box>
-                    <Box className="text-sm"><a className="underline" href={practice.website}>{practice.website}</a></Box>
+                <Box className="text-center font-sans text-2xl text-white font-medium">
+                        Providers
                 </Box>
-                <Box className="flex flex-row justify-baseline gap-2 flex-wrap">
-                    <Box className="text-sm font-medium w-20 ">Phone: </Box>
-                    <Box className="text-sm">{practice.phone}</Box>
-                </Box>
-                <Box className="flex flex-row justify-baseline gap-2 flex-wrap">
-                    <Box className="text-sm font-medium w-20">Tags: </Box>
-                    <Box className="text-sm">{practice.tags}</Box>
-                </Box>
-              
+                <Table className="font-sans text-white" withTableBorder data={tableData}></Table>
+
             </Box>
         )
     }
