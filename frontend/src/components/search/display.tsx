@@ -71,6 +71,7 @@ export function Map(props: DataDisplayProps){
 
     useEffect(() => {
         if (map != undefined){
+
             if (props.practiceList != undefined){
                 map.clearMarkers()
                 for (let index = 0; index < props.practiceList.practices.length; index++) {
@@ -82,12 +83,13 @@ export function Map(props: DataDisplayProps){
                             text: element.name
                         },
                     }).setLngLat([element.longitude, element.lattitude]).addTo(map)
-                    map.fitToMarkers()
                 }
+                map.fitToMarkers()
             }
  
 
             if (props.mapConfiguration != undefined && props.mapConfiguration.RadiusFeature) {
+                map.clearFeatures()
                 Radar.ui.marker(
                     {
                         color: "blue",
@@ -105,6 +107,14 @@ export function Map(props: DataDisplayProps){
                     geometry: {
                         type: "Polygon",
                         coordinates:ZoneCoords(props.mapConfiguration.RadiusOrigin, props.mapConfiguration.Radius, 50)
+                    }
+                }, {
+                    paint: {
+                        "fill-color": "yellow", 
+                        "fill-opacity": .1,
+                        "border-width": 1,
+                        "border-color": "red",
+                        "border-opacity": .3,
                     }
                 })
                 map.fitToFeatures()
@@ -134,7 +144,7 @@ function ZoneCoords(lngLt: LngLatLike, radius: number, resolution: number): Posi
 
     for (var i = 0; i < resolution; i++)
     {
-        out.push([long + radiusLon + Math.cos(theta),lat + radiusLat + Math.sin(theta)]);
+        out.push([long + radiusLon * Math.cos(theta),lat + radiusLat * Math.sin(theta)]);
         theta += dTheta;
     }
 

@@ -94,7 +94,7 @@ function SearchByLocation(props:PracticeUpdaterI){
                         mapConfiguration: {
                             RadiusFeature: true,
                             RadiusOrigin: [long, lat],
-                            Radius: 10
+                            Radius: 20
                         }
                     }
                 )})
