@@ -69,8 +69,10 @@ function Selected(props:SelectedProps){
             body: []
         }
 
-        for(let i = 0; i<providers.providers.length; i++){
-            tableData.body.push([providers.providers[i].name, providers.providers[i].tags])
+        if (providers != undefined){
+            for(let i = 0; i<providers.providers.length; i++){
+                tableData.body.push([providers.providers[i].name, providers.providers[i].tags])
+            }    
         }
 
         
