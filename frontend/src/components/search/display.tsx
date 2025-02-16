@@ -114,7 +114,7 @@ function SearchByLocation(props:PracticeUpdaterI){
         <div>
            <Box className='flex justify-center h-full flex-col p-2'>
                 <Box className="bg-white p-4 flex flex-col gap-2">
-                    <Box className="flex flex-row gap-5 ">
+                    <Box className="flex flex-col sm:flex-row gap-5 ">
                         <Box className='font-sans text-xl font-medium text-sky-950 flex flex-col justify-center'>Search Radius:</Box>
                         <Button onClick={()=>{setRadius(25)}}>25 Miles  </Button>
                         <Button onClick={()=>{setRadius(50)}}>50 Miles  </Button>
