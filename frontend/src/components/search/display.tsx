@@ -1,8 +1,8 @@
-import { Box, Table, Tabs } from "@mantine/core";
+import { Box, Divider, Table, TableData, Tabs } from "@mantine/core";
 import Radar from "radar-sdk-js";
 import RadarMap from "radar-sdk-js/dist/ui/RadarMap";
 import { useCallback, useEffect, useState } from "react";
-import { LimitedPracticePracticeListI as LimitedPracticesListI, PracticeListI as PracticeListI } from "../../model/practice";
+import { LimitedPracticePracticeListI as LimitedPracticesListI, PracticeI, PracticeListI as PracticeListI } from "../../model/practice";
 import { LngLatBoundsLike, LngLatLike} from "maplibre-gl";
 import {Position} from "geojson"
 
@@ -10,23 +10,93 @@ import {Position} from "geojson"
 export interface DataDisplayProps {
     practiceList?: PracticeListI
     mapConfiguration?: MapConfiguration
+    setSelectedPractice?: (id:string)=>void
 }
 
 export function DataDisplay(props:DataDisplayProps) {
+    const [selectedPractice, setSelectedPractice] = useState("")
+
     return (
-            <Tabs defaultValue={"Map"} className="rounded-2xl w-6xl h-150">
-                <Tabs.List className="bg-cyan-700 rounded-t-xl">
-                    <Tabs.Tab value="Map"><h1 className="font-sans text-white font-medium">Map</h1></Tabs.Tab>
-                    <Tabs.Tab value="Map"><h1 className="font-sans text-white font-medium">Practices</h1></Tabs.Tab>
-                </Tabs.List>
-                <Tabs.Panel value="Map" className='flex justify-center w-full h-full'>
-                    <Map {...props}/>
-                </Tabs.Panel>
-                <Tabs.Panel value="Practices" className='h-full w-full'>
-                    <PracticeTable {...props}/>
-                </Tabs.Panel>
-            </Tabs>
+            <Box className="flex flex-col md:flex-row w-full justify-center">
+                <Tabs defaultValue={"Map"} className="w-full md:w-7/8 max-w-5xl">
+                    <Tabs.List className="bg-cyan-700 rounded-t-xl md:rounded-tl-xl md:rounded-tr-none">
+                        <Tabs.Tab value="Map"><h1 className="font-sans text-white font-medium">Map</h1></Tabs.Tab>
+                        <Tabs.Tab value="Map"><h1 className="font-sans text-white font-medium">Practices</h1></Tabs.Tab>
+                    </Tabs.List>
+                    <Tabs.Panel value="Map" className='flex justify-center w-full h-full'>
+                        <Map setSelectedPractice={setSelectedPractice} {...props}/>
+                    </Tabs.Panel>
+                    <Tabs.Panel value="Practices" className='h-full w-full'>
+                        <PracticeTable {...props}/>
+                    </Tabs.Panel>
+                </Tabs>
+                <Box className="md:h-full md:w-xs min-h-25 bg-cyan-700 ">
+                    <Selected practiceId={selectedPractice}/>
+                </Box>
+            </Box>
     )
+}
+
+interface SelectedProps {
+    practiceId: string
+}
+
+function Selected(props:SelectedProps){
+
+    const [practice, setPractice] = useState<PracticeI>()
+
+    useEffect(()=>{
+        if (props.practiceId != ""){
+            fetch("/api/v1/providersearch/practice/"+props.practiceId).then((r) =>r.json()).then(pr=>{
+                setPractice(pr)
+            })
+        }
+
+    }, [props.practiceId])
+    
+    if (practice === undefined) {
+        return (
+            <Box className="text-center p-5 text-2xl text-white font-sans font-medium">No Practice Selected</Box>
+        )
+    } else {
+        let tableData: TableData = {
+            head: ["Name", "Address"],
+            body: []
+        }
+
+        tableData.body.push([practice.name])
+        tableData.body.push([practice.fullAddress])
+
+        
+
+        return (
+            <Box className="text-white overflow-hidden font-sans flex flex-col gap-5 p-6 w-full justify-center text-wrap">
+                <Box className="flex flex-row gap-2 justify-baseline flex-wrap">
+                    <Box className="text-sm w-20 font-medium">Name: </Box>
+                    <Box className="text-sm">{practice.name}</Box>
+                </Box>
+                <Box className="flex flex-row justify-baseline gap-2 flex-wrap">
+                    <Box className="text-sm font-medium w-20">Address: </Box>
+                    <Box className="text-sm">{practice.fullAddress}</Box>
+                </Box>
+                <Box className="flex flex-row justify-baseline gap-2 flex-wrap">
+                    <Box className="text-sm font-medium w-20">Website: </Box>
+                    <Box className="text-sm"><a className="underline" href={practice.website}>{practice.website}</a></Box>
+                </Box>
+                <Box className="flex flex-row justify-baseline gap-2 flex-wrap">
+                    <Box className="text-sm font-medium w-20 ">Phone: </Box>
+                    <Box className="text-sm">{practice.phone}</Box>
+                </Box>
+                <Box className="flex flex-row justify-baseline gap-2 flex-wrap">
+                    <Box className="text-sm font-medium w-20">Tags: </Box>
+                    <Box className="text-sm">{practice.tags}</Box>
+                </Box>
+              
+            </Box>
+        )
+    }
+
+  
 }
 
 
@@ -79,13 +149,15 @@ export function Map(props: DataDisplayProps){
                 map.clearMarkers()
                 for (let index = 0; index < props.practiceList.practices.length; index++) {
                     const element = props.practiceList.practices[index];
-                    Radar.ui.marker({
+                    const marker = Radar.ui.marker({
                         color: 'red',
                         scale: .5,
                         popup: {
                             text: element.name
                         },
-                    }).setLngLat([element.longitude, element.lattitude]).addTo(map)
+                    })
+                    marker.on("click", ()=>{if(props.setSelectedPractice !=undefined){props.setSelectedPractice(element.practiceId)}})
+                    marker.setLngLat([element.longitude, element.lattitude]).addTo(map)
                 }
                 map.fitToMarkers()
             }
@@ -93,12 +165,13 @@ export function Map(props: DataDisplayProps){
 
             if (props.mapConfiguration != undefined && props.mapConfiguration.RadiusFeature) {
                 map.clearFeatures()
-                Radar.ui.marker(
+                const marker = Radar.ui.marker(
                     {
                         color: "blue",
                         scale: .75,
                     }
-                ).setLngLat(props.mapConfiguration.RadiusOrigin).addTo(map)
+                )
+                marker.setLngLat(props.mapConfiguration.RadiusOrigin).addTo(map)
 
                 console.log(ZoneCoords(props.mapConfiguration.RadiusOrigin, props.mapConfiguration.Radius, 100))
                 map.addPolygon({
@@ -109,7 +182,7 @@ export function Map(props: DataDisplayProps){
                     },
                     geometry: {
                         type: "Polygon",
-                        coordinates:ZoneCoords(props.mapConfiguration.RadiusOrigin, props.mapConfiguration.Radius, 50)
+                        coordinates:ZoneCoords(props.mapConfiguration.RadiusOrigin, props.mapConfiguration.Radius, 100)
                     }
                 }, {
                     paint: {
@@ -130,7 +203,7 @@ export function Map(props: DataDisplayProps){
       }, [props.practiceList, props.mapConfiguration, map]);
 
       return(
-        <div id="map" style={{width: "1152px", height:600}} className="rounded-b-2xl"/>
+        <div id="map" className="w-full h-75 md:h-150 md:rounded-b-2xl"/>
       )
 }
 

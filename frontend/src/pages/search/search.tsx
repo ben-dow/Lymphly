@@ -93,7 +93,7 @@ function SearchByLocation(props:PracticeUpdaterI){
             let lat = pos.coords.latitude
             let long = pos.coords.longitude
 
-            fetch(`/api/v1/providersearch/practices/locate/proximity?lat=${lat}&long=${long}&radius=20`).
+            fetch(`/api/v1/providersearch/practices/locate/proximity?lat=${lat}&long=${long}&radius=25`).
                 then(res => res.json()).
                 then((res)=>{props.updateDataDisplayProps(
                     {
@@ -101,7 +101,7 @@ function SearchByLocation(props:PracticeUpdaterI){
                         mapConfiguration: {
                             RadiusFeature: true,
                             RadiusOrigin: [long, lat],
-                            Radius: 20
+                            Radius: 25
                         }
                     }
                 )})
