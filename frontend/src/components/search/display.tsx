@@ -94,7 +94,7 @@ function Selected(props:SelectedProps){
                     </Box>
                     <Box className="flex flex-row justify-baseline gap-2 flex-wrap">
                         <Box className="text-sm font-medium w-20">Website: </Box>
-                        <Box className="text-sm"><a className="underline" href={practice.website}>{practice.website}</a></Box>
+                        <Box className="text-sm"><a  target="_blank" rel="noopener noreferrer" className="underline" href={practice.website}>{practice.website}</a></Box>
                     </Box>
                     <Box className="flex flex-row justify-baseline gap-2 flex-wrap">
                         <Box className="text-sm font-medium w-20 ">Phone: </Box>
