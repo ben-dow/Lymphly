@@ -59,15 +59,18 @@ export function Map(props: DataDisplayProps){
     const [map, setMap] = useState<RadarMap>(undefined)
 
     useEffect(() => {
+        if (map === undefined){
             fetch("/radar_pub_key.txt").then((r) =>r.text()).then(text=>{
                 Radar.initialize(text);
                 const Map = Radar.ui.map({
                     container: "map",
-                    zoom:0,
+                    zoom: 0,
                 })
                 setMap(Map)
             })
-    }, [])
+        }
+
+    }, [map])
 
     useEffect(() => {
         if (map != undefined){
@@ -120,6 +123,7 @@ export function Map(props: DataDisplayProps){
                 map.fitToFeatures()
             }
 
+            map.redraw()
         }
       }, [props.practiceList, props.mapConfiguration, map]);
 

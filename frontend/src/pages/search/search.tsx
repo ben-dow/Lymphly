@@ -13,7 +13,10 @@ export default function Search(){
         fetch("/api/v1/providersearch/practices/all").then((r) =>r.json()).then(j=>{
             const pl: PracticeListI = j
             setDataDisplayProps({
-                practiceList: pl
+                practiceList: pl,
+                mapConfiguration:{
+                    RadiusFeature: false
+                }
             })
         })
     }, [])
