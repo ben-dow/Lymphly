@@ -181,9 +181,9 @@ export function Map(props: DataDisplayProps){
                 map.fitToMarkers()
             }
  
+            map.clearFeatures()
 
             if (props.mapConfiguration != undefined && props.mapConfiguration.RadiusFeature) {
-                map.clearFeatures()
                 const marker = Radar.ui.marker(
                     {
                         color: "blue",
@@ -213,13 +213,11 @@ export function Map(props: DataDisplayProps){
                     }
                 })
                 map.fitToFeatures()
-            } else {
-                map.clearFeatures()
             }
 
             map.redraw()
         }
-      }, [props.practiceList, props.mapConfiguration, map]);
+      }, [props.practiceList, props.mapConfiguration,  map]);
 
       return(
         <div id="map" className="w-full h-75 md:h-150 md:rounded-b-2xl"/>

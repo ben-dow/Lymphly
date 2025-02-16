@@ -1,4 +1,4 @@
-import {Box, Divider, Tabs, Text} from '@mantine/core'
+import {Box, Button, Divider, Tabs, Text} from '@mantine/core'
 import 'radar-sdk-js/dist/radar.css'
 import { useEffect, useState } from 'react';
 import { PracticeListI } from '../../model/practice';
@@ -88,12 +88,14 @@ function SearchHome(){
 
 function SearchByLocation(props:PracticeUpdaterI){
 
+    const [radius, setRadius] = useState(25)
+
     useEffect(()=>{
         navigator.geolocation.getCurrentPosition((pos)=>{
             let lat = pos.coords.latitude
             let long = pos.coords.longitude
 
-            fetch(`/api/v1/providersearch/practices/locate/proximity?lat=${lat}&long=${long}&radius=25`).
+            fetch(`/api/v1/providersearch/practices/locate/proximity?lat=${lat}&long=${long}&radius=${radius}`).
                 then(res => res.json()).
                 then((res)=>{props.updateDataDisplayProps(
                     {
@@ -101,7 +103,7 @@ function SearchByLocation(props:PracticeUpdaterI){
                         mapConfiguration: {
                             RadiusFeature: true,
                             RadiusOrigin: [long, lat],
-                            Radius: 25
+                            Radius: radius
                         }
                     }
                 )})
@@ -109,12 +111,16 @@ function SearchByLocation(props:PracticeUpdaterI){
         })
 
 
-    }, [])
+    }, [radius])
 
 
     return (
         <div>
-           <Box className='flex justify-center'>
+           <Box className='flex justify-center gap-5'>
+                <Box className='font-sans flex flex-col justify-center'>Select Radius:</Box>
+                <Button onClick={()=>{setRadius(25)}}>25 Miles  </Button>
+                <Button onClick={()=>{setRadius(50)}}>50 Miles  </Button>
+                <Button onClick={()=>{setRadius(100)}}>100 Miles  </Button>
             </Box>
         </div>
     )
