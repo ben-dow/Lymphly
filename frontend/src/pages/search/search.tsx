@@ -2,17 +2,19 @@ import {Box, Divider, Tabs, Text} from '@mantine/core'
 import 'radar-sdk-js/dist/radar.css'
 import { useEffect, useState } from 'react';
 import { PracticeListI } from '../../model/practice';
-import { DataDisplay, Map } from '../../components/search/display';
+import { DataDisplay, DataDisplayProps, Map } from '../../components/search/display';
 import { Routes, Route, Router, useNavigate } from 'react-router';
 
 
 export default function Search(){
-    const [practices, setPractices] = useState<PracticeListI>({practices:[]})
+    const [dataDisplayProps, setDataDisplayProps] = useState<DataDisplayProps>({})
 
     useEffect(() => {
         fetch("/api/v1/providersearch/practices/all").then((r) =>r.json()).then(j=>{
             const pl: PracticeListI = j
-            setPractices(pl)
+            setDataDisplayProps({
+                practiceList: pl
+            })
         })
     }, [])
     let navigate = useNavigate()
@@ -24,13 +26,13 @@ export default function Search(){
             </div>
             <Routes>
                 <Route index element={<SearchHome/>}/>
-                <Route path="current" element={<SearchByLocation updatePractices={setPractices}/>}/>
+                <Route path="current" element={<SearchByLocation updateDataDisplayProps={setDataDisplayProps}/>}/>
                 <Route path="address" element={<SearchByAddress/>}/>
                 <Route path="state" element={<SearchByState/>}/>
             </Routes>       
 
             <Box className='flex justify-center'>
-                <DataDisplay practiceList={practices}/>
+                <DataDisplay {...dataDisplayProps}/>
             </Box>
      
         </Box>
@@ -38,7 +40,7 @@ export default function Search(){
 }
 
 interface PracticeUpdaterI{
-    updatePractices: Function
+    updateDataDisplayProps: Function
 }
 
 function SearchHome(){
@@ -84,7 +86,13 @@ function SearchByLocation(props:PracticeUpdaterI){
             let lat = pos.coords.latitude
             let long = pos.coords.longitude
 
-            fetch(`/api/v1/providersearch/practices/locate/proximity?lat=${lat}&long=${long}&radius=20`).then(res => res.json()).then((res)=>{props.updatePractices(res)})
+            fetch(`/api/v1/providersearch/practices/locate/proximity?lat=${lat}&long=${long}&radius=20`).
+                then(res => res.json()).
+                then((res)=>{props.updateDataDisplayProps(
+                    {
+                        practices: res
+                    }
+                )})
             
         })
 
@@ -95,7 +103,6 @@ function SearchByLocation(props:PracticeUpdaterI){
     return (
         <div>
            <Box className='flex justify-center'>
-                <Map practiceList={{practices: []}}/>
             </Box>
         </div>
     )

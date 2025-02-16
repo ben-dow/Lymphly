@@ -3,10 +3,12 @@ import Radar from "radar-sdk-js";
 import RadarMap from "radar-sdk-js/dist/ui/RadarMap";
 import { useCallback, useEffect, useState } from "react";
 import { LimitedPracticePracticeListI as LimitedPracticesListI, PracticeListI as PracticeListI } from "../../model/practice";
+import { LngLatBoundsLike, LngLatLike } from "maplibre-gl";
 
 
-interface DataDisplayProps {
-    practiceList: PracticeListI
+export interface DataDisplayProps {
+    practiceList?: PracticeListI
+    mapConfiguration?: MapConfiguration
 }
 
 export function DataDisplay(props:DataDisplayProps) {
@@ -45,61 +47,49 @@ export function PracticeTable(props: DataDisplayProps){
 
 }
 
-interface MapProps{
-    practiceList: LimitedPracticesListI
+
+interface MapConfiguration {
+    LocationMarker?: LngLatLike
+    RadiusFeature?: boolean
+    Radius?: number
 }
 
-function useRadar() {
-    const [initialized, setInitialized] = useState(false)
+export function Map(props: DataDisplayProps){
+    const [map, setMap] = useState<RadarMap>()
 
-    const initialize = useCallback(()=>{
-        fetch("/radar_pub_key.txt").then((r) =>r.text()).then(text=>{
-            Radar.initialize(text);
-            setInitialized(true);
-        })
+    useEffect(() => {
+            fetch("/radar_pub_key.txt").then((r) =>r.text()).then(text=>{
+                Radar.initialize(text);
+                const Map = Radar.ui.map({
+                    container: "map",
+                    zoom: 2
+                })
+                setMap(Map)
+            })
     }, [])
 
-    useEffect(()=>{
-        initialize()    
-    },[])
-    
-    return initialized
-}
-
-export function Map(props: MapProps){
-    let initialized = useRadar()
-    const [map, setMap] = useState<RadarMap>()
-    const practiceList = props.practiceList.practices
-
     useEffect(() => {
-        if (initialized){
-            const Map = Radar.ui.map({
-                container: "map",
-                zoom: 1,
-                
-            })
-            setMap(Map)
-        }
-    }, [initialized])
-
-    useEffect(() => {
-        if (map != undefined){
+        if (map != undefined && props.practiceList != undefined ){
             map.clearMarkers()
-            for (let index = 0; index < practiceList.length; index++) {
-                const element = practiceList[index];
+            for (let index = 0; index < props.practiceList.practices.length; index++) {
+                const element = props.practiceList.practices[index];
                 Radar.ui.marker({
                     color: 'red',
                     scale: .5,
                     popup: {
                         text: element.name
-                    }
+                    },
                 }).setLngLat([element.longitude, element.lattitude]).addTo(map)
+                map.fitToMarkers()
             }
-            map.fitToMarkers()
+
+            if (props.mapConfiguration != undefined && props.mapConfiguration.RadiusFeature) {
+
+            }
         }
-      }, [practiceList, map]);
+      }, [props.practiceList, props.mapConfiguration, map]);
 
       return(
-        <div id="map" className="w-full h-full rounded-b-2xl"/>
+        <div id="map" style={{width: "1152px", height:600}} className="rounded-b-2xl"/>
       )
 }
