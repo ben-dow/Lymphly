@@ -26,7 +26,7 @@ export function DataDisplay() {
     practices: [],
   });
   const [mapCfg, setMapCfg] = useState<MapConfiguration>();
-  const [visible, { open, close, toggle }] = useDisclosure(false);
+  const [visible, { open, close }] = useDisclosure(false);
 
   return (
     <Box pos={"relative"} className="flex flex-col w-full md:w-7xl">
@@ -376,7 +376,7 @@ function SearchByState(props: PracticeUpdaterI) {
           props.loadingOn();
           fetch(
             `/api/v1/providersearch/practices/locate/state/` +
-              usStates[res.valueOf()],
+            usStates[res.valueOf()],
           )
             .then((res) => res.json())
             .then((res) => {
