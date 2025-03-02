@@ -132,21 +132,46 @@ function SearchByLocation(props:PracticeUpdaterI){
 
 function SearchByAddress(props:PracticeUpdaterI){
     const [addr, setAddr] = useState("")
+    const [radius, setRadius] = useState(25)
+    const [firstRequestMade, setFirstRequestMade] = useState(false)
+
+    const update = () =>{
+        fetch(`/api/v1/providersearch/practices/locate/proximity?addr=${btoa(addr)}&radius=${radius}`).
+        then(res => res.json()).
+        then((res)=>{
+            props.setPractices(res)
+            props.setMapCfg({
+                RadiusFeature: true,
+                RadiusOrigin: [res["originLongitude"], res["originLatitude"]],
+                Radius: radius
+            })
+        })
+    }
+
+    useEffect(()=>{
+        if (addr != "" && firstRequestMade){
+            update()
+        }
+    },[radius])
+
     return(
         <Box>
             <TextInput value={addr} onChange={(e)=>{setAddr(e.currentTarget.value)}}/>
             <Button onClick={()=>{
-                fetch(`/api/v1/providersearch/practices/locate/proximity?addr=${btoa(addr)}&radius=25`).
-                then(res => res.json()).
-                then((res)=>{
-                    props.setPractices(res)
-                    props.setMapCfg({
-                        RadiusFeature: true,
-                        RadiusOrigin: [res["originLongitude"], res["originLatitude"]],
-                        Radius: 25
-                    })
-                })
+                setFirstRequestMade(true)
+                update()
             }}>Search</Button>
+
+            <Box className=''>
+                    <Box className="">
+                        <Button onClick={()=>{setRadius(25)}}>25 Miles  </Button>
+                        <Button onClick={()=>{setRadius(50)}}>50 Miles  </Button>
+                        <Button onClick={()=>{setRadius(100)}}>100 Miles  </Button>
+                    </Box>
+                    <Box className="text-center">
+                        Current: {radius} Miles
+                    </Box>
+            </Box>
         </Box>
     )
 }
