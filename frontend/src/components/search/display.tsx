@@ -1,10 +1,12 @@
-import { Box, Button, Divider, Table, TableData, Tabs } from "@mantine/core";
+import { Box, Button, Divider, Input, Select, Table, TableData, Tabs, TextInput } from "@mantine/core";
 import Radar from "radar-sdk-js";
 import RadarMap from "radar-sdk-js/dist/ui/RadarMap";
 import { useCallback, useEffect, useState } from "react";
 import { LimitedPracticePracticeListI as LimitedPracticesListI, PracticeI, PracticeListI as PracticeListI, ProviderListI } from "../../model/practice";
 import { LngLatBoundsLike, LngLatLike} from "maplibre-gl";
 import {Position} from "geojson"
+import { useElementSize } from "@mantine/hooks";
+import base64url from "base64url";
 
 export function DataDisplay() {
     const [selectedPractice, setSelectedPractice] = useState("")
@@ -28,10 +30,10 @@ export function DataDisplay() {
                         <SearchByLocation setMapCfg={setMapCfg} setPractices={setPractices}/>
                     </Tabs.Panel>
                     <Tabs.Panel value="addr" className='h-full w-full'>
-                        Address
+                        <SearchByAddress setMapCfg={setMapCfg} setPractices={setPractices}/>
                     </Tabs.Panel>
                     <Tabs.Panel value="state" className='h-full w-full'>
-                        State
+                        <SearchByState setMapCfg={setMapCfg} setPractices={setPractices}/>
                     </Tabs.Panel>
                 </Tabs>
             </Box>
@@ -82,7 +84,6 @@ function Browse(props: BrowseProps){
 interface PracticeUpdaterI{
     setPractices: (props: LimitedPracticesListI) => void
     setMapCfg: (mapCfg: MapConfiguration) => void
-
 }
 
 
@@ -128,6 +129,103 @@ function SearchByLocation(props:PracticeUpdaterI){
         </div>
     )
 }
+
+function SearchByAddress(props:PracticeUpdaterI){
+    const [addr, setAddr] = useState("")
+    return(
+        <Box>
+            <TextInput value={addr} onChange={(e)=>{setAddr(e.currentTarget.value)}}/>
+            <Button onClick={()=>{
+                fetch(`/api/v1/providersearch/practices/locate/proximity?addr=${btoa(addr)}&radius=25`).
+                then(res => res.json()).
+                then((res)=>{
+                    props.setPractices(res)
+                    props.setMapCfg({
+                        RadiusFeature: false,
+                    })
+                })
+            }}>Search</Button>
+        </Box>
+    )
+}
+
+function SearchByState(props:PracticeUpdaterI){
+    var usStates = {
+        "ALABAMA": 'AL',
+        "ALASKA": 'AK',
+        "AMERICAN SAMOA": 'AS',
+        "ARIZONA": 'AZ',
+        "ARKANSAS": 'AR',
+        "CALIFORNIA": 'CA',
+        "COLORADO": 'CO',
+        "CONNECTICUT": 'CT',
+        "DELAWARE": 'DE',
+        "DISTRICT OF COLUMBIA": 'DC',
+        "FLORIDA": 'FL',
+        "GEORGIA": 'GA',
+        "GUAM": 'GU',
+        "HAWAII": 'HI',
+        "IDAHO": 'ID',
+        "ILLINOIS": 'IL',
+        "INDIANA": 'IN',
+        "IOWA": 'IA',
+        "KANSAS": 'KS',
+        "KENTUCKY": 'KY',
+        "LOUISIANA": 'LA',
+        "MAINE": 'ME',
+        "MARSHALL ISLANDS": 'MH',
+        "MARYLAND": 'MD',
+        "MASSACHUSETTS": 'MA',
+        "MICHIGAN": 'MI',
+        "MINNESOTA": 'MN',
+        "MISSISSIPPI": 'MS',
+        "MISSOURI": 'MO',
+        "MONTANA": 'MT',
+        "NEBRASKA": 'NE',
+        "NEVADA": 'NV',
+        "NEW HAMPSHIRE": 'NH',
+        "NEW JERSEY": 'NJ',
+        "NEW MEXICO": 'NM',
+        "NEW YORK": 'NY',
+        "NORTH CAROLINA": 'NC',
+        "NORTH DAKOTA": 'ND',
+        "NORTHERN MARIANA ISLANDS": 'MP',
+        "OHIO": 'OH',
+        "OKLAHOMA": 'OK',
+        "OREGON": 'OR',
+        "PALAU": 'PW',
+        "PENNSYLVANIA": 'PA',
+        "PUERTO RICO": 'PR',
+        "RHODE ISLAND": 'RI',
+        "SOUTH CAROLINA": 'SC',
+        "SOUTH DAKOTA": 'SD',
+        "TENNESSEE": 'TN',
+        "TEXAS": 'TX',
+        "UTAH": 'UT',
+        "VERMONT": 'VT',
+        "VIRGIN ISLANDS": 'VI',
+        "VIRGINIA": 'VA',
+        "WASHINGTON": 'WA',
+        "WEST VIRGINIA": 'WV',
+        "WISCONSIN": 'WI',
+        "WYOMING": 'WY',
+    }
+    return(
+        <Box>
+            <Select data={Object.keys(usStates)} onChange={(res)=>{
+                fetch(`/api/v1/providersearch/practices/locate/state/`+usStates[res.valueOf()]).
+                then(res => res.json()).
+                then((res)=>{
+                    props.setPractices(res)
+                    props.setMapCfg({
+                        RadiusFeature: false,
+                    })
+                })
+            }}/>
+        </Box>
+    )
+}
+
 
 interface SelectedProps {
     practiceId: string
@@ -236,8 +334,8 @@ export function PracticeTable(props: PracticeTableProps){
             </Table>
     </Box>
     )
-
 }
+
 
 interface MapProps {
     mapConfiguration?:MapConfiguration

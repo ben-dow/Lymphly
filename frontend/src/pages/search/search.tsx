@@ -27,13 +27,5 @@ function SearchByAddress(){
 }
 
 
-function SearchByState(){
-    return (
-        <div>
-            Location
-        </div>
-    )
-}
-
 
 
