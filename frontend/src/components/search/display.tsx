@@ -5,7 +5,7 @@ import {
   LoadingOverlay,
   Select,
   Tabs,
-  TextInput
+  TextInput,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { Position } from "geojson";
@@ -376,7 +376,7 @@ function SearchByState(props: PracticeUpdaterI) {
           props.loadingOn();
           fetch(
             `/api/v1/providersearch/practices/locate/state/` +
-            usStates[res.valueOf()],
+              usStates[res.valueOf()],
           )
             .then((res) => res.json())
             .then((res) => {
