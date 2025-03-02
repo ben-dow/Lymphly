@@ -10,7 +10,7 @@ resource "aws_apigatewayv2_stage" "default_stage" {
 }
 
 resource "aws_apigatewayv2_authorizer" "authorizer" {
-  api_id = aws_apigatewayv2_api.api
+  api_id = aws_apigatewayv2_api.api.id
   authorizer_type = "JWT"
   identity_sources = ["$request.header.Authorization"]
   name = "${var.application_name}-${var.environment_name}-authorizer"
