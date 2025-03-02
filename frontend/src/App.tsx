@@ -10,7 +10,7 @@ export default function App() {
       withBorder={false}
       header={{ height: 100 }}
       padding="md"
-      className="bg-sky-950 sm:h-screen  w-full"
+      className="bg-sky-200 sm:h-screen  w-full"
       footer={{
         height: 100
       }}

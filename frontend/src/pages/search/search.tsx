@@ -8,24 +8,13 @@ import { Routes, Route, Router, useNavigate } from 'react-router';
 
 export default function Search(){
     return(
-        <Box className={"bg-sky-200 p-5 shadow-sm w-full h-full flex flex-col gap-5"}>
+        <Box className={"p-5 w-full h-full flex flex-col gap-5"}>
             <Box className='flex justify-center'>
                 <DataDisplay/>
             </Box>
         </Box>
     )
 }
-
-
-
-function SearchByAddress(){
-    return (
-        <div>
-            Location
-        </div>
-    )
-}
-
 
 
 

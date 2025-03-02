@@ -1,21 +1,23 @@
-import { Box, Button, Divider, Input, Select, Table, TableData, Tabs, TextInput } from "@mantine/core";
+import { Box, Button, Divider, Input, Loader, LoadingOverlay, Select, Table, TableData, Tabs, TextInput } from "@mantine/core";
 import Radar from "radar-sdk-js";
 import RadarMap from "radar-sdk-js/dist/ui/RadarMap";
 import { useCallback, useEffect, useState } from "react";
 import { LimitedPracticePracticeListI as LimitedPracticesListI, PracticeI, PracticeListI as PracticeListI, ProviderListI } from "../../model/practice";
 import { LngLatBoundsLike, LngLatLike} from "maplibre-gl";
 import {Position} from "geojson"
-import { useElementSize } from "@mantine/hooks";
+import { useDisclosure, useElementSize } from "@mantine/hooks";
 import base64url from "base64url";
 
 export function DataDisplay() {
     const [selectedPractice, setSelectedPractice] = useState("")
     const [practices, setPractices] = useState<LimitedPracticesListI>({practices:[]})
     const [mapCfg, setMapCfg] = useState<MapConfiguration>()
+    const [visible, { open, close, toggle }] = useDisclosure(false);
 
     return (
-        <Box className="flex flex-col w-full md:w-7xl">
-            <Box className="w-full flex justify-center rounded-tl-xl bg-cyan-500">
+        <Box pos={"relative"} className="flex flex-col w-full md:w-7xl">
+            <LoadingOverlay visible={visible} zIndex={1000} overlayProps={{ radius: "md", blur: 1 }} />
+            <Box className="w-full flex justify-center rounded-tl-xl bg-white">
                 <Tabs defaultValue={"browse"} className="w-full" orientation='vertical' keepMounted={false}>
                     <Tabs.List className="bg-cyan-600 rounded-t-xl md:rounded-tl-xl md:rounded-tr-none">
                         <Tabs.Tab value="browse"><h1 className="font-sans text-white font-medium">Browse</h1></Tabs.Tab>
@@ -27,21 +29,21 @@ export function DataDisplay() {
                         <Browse setMapCfg={setMapCfg}  setPractices={setPractices}/>
                     </Tabs.Panel>
                     <Tabs.Panel value="current" className='flex justify-center w-full h-full'>
-                        <SearchByLocation setMapCfg={setMapCfg} setPractices={setPractices}/>
+                        <SearchByLocation loadingOn={open} loadingOff={close}  setMapCfg={setMapCfg} setPractices={setPractices}/>
                     </Tabs.Panel>
                     <Tabs.Panel value="addr" className='h-full w-full'>
-                        <SearchByAddress setMapCfg={setMapCfg} setPractices={setPractices}/>
+                        <SearchByAddress  loadingOn={open} loadingOff={close}  setMapCfg={setMapCfg} setPractices={setPractices}/>
                     </Tabs.Panel>
                     <Tabs.Panel value="state" className='h-full w-full'>
-                        <SearchByState setMapCfg={setMapCfg} setPractices={setPractices}/>
+                        <SearchByState  loadingOn={open} loadingOff={close}  setMapCfg={setMapCfg} setPractices={setPractices}/>
                     </Tabs.Panel>
                 </Tabs>
             </Box>
-            <Box className="flex flex-col md:flex-row w-full justify-center">
+            <Box className="flex flex-col md:flex-row w-full justify-center border-t">
                 <Tabs defaultValue={"Map"} className="w-full md:w-7/8 max-w-5xl">
                     <Tabs.List className="bg-cyan-700  md:rounded-tr-none">
                         <Tabs.Tab value="Map"><h1 className="font-sans text-white font-medium">Map</h1></Tabs.Tab>
-                        <Tabs.Tab value="Table"><h1 className="font-sans text-white font-medium">Table</h1></Tabs.Tab>
+                        <Tabs.Tab value="Table"><h1 className="font-sans text-white font-medium">List</h1></Tabs.Tab>
                     </Tabs.List>
                     <Tabs.Panel value="Map" className='flex justify-center w-full h-full'>
                         <Map mapConfiguration={mapCfg} setSelectedPractice={setSelectedPractice} practiceList={practices}/>
@@ -50,7 +52,7 @@ export function DataDisplay() {
                         <PracticeTable practiceList={practices} updatedSelected={setSelectedPractice}/>
                     </Tabs.Panel>
                 </Tabs>
-                <Box className="md:h-full md:w-xs min-h-25 bg-cyan-950 ">
+                <Box className="md:h-full md:w-xs min-h-25 w-full  bg-gray-100 ">
                     <Selected practiceId={selectedPractice}/>
                 </Box>
             </Box>
@@ -64,7 +66,7 @@ interface BrowseProps {
 }
 
 function Browse(props: BrowseProps){
-
+    
     useEffect(()=>{
         fetch("/api/v1/providersearch/practices/all").then((r) =>r.json()).then(j=>{
             const pl: PracticeListI = j
@@ -73,10 +75,9 @@ function Browse(props: BrowseProps){
         })
     }, [])
 
-
     return (
-        <Box>
-            Browse using the map or table below
+        <Box className="w-full h-full flex justify-center items-center">
+            <Box className="text-xl font-sans font-semibold">Now Displaying All Practices</Box>
         </Box>
     )
 }
@@ -84,6 +85,8 @@ function Browse(props: BrowseProps){
 interface PracticeUpdaterI{
     setPractices: (props: LimitedPracticesListI) => void
     setMapCfg: (mapCfg: MapConfiguration) => void
+    loadingOn: () => void
+    loadingOff: () => void
 }
 
 
@@ -95,7 +98,7 @@ function SearchByLocation(props:PracticeUpdaterI){
         navigator.geolocation.getCurrentPosition((pos)=>{
             let lat = pos.coords.latitude
             let long = pos.coords.longitude
-
+            props.loadingOn()
             fetch(`/api/v1/providersearch/practices/locate/proximity?lat=${lat}&long=${long}&radius=${radius}`).
                 then(res => res.json()).
                 then((res)=>{
@@ -105,6 +108,8 @@ function SearchByLocation(props:PracticeUpdaterI){
                         RadiusOrigin: [long, lat],
                         Radius: radius
                     })
+                }).finally(()=>{
+                    props.loadingOff()
                 })
             
         })
@@ -114,7 +119,7 @@ function SearchByLocation(props:PracticeUpdaterI){
     return (
         <div>
            <Box className='flex justify-center h-full flex-col p-2'>
-                <Box className="bg-white p-4 flex flex-col gap-2">
+                <Box className="bg-white rounded  p-4 flex flex-col gap-2">
                     <Box className="flex flex-col sm:flex-row gap-5 ">
                         <Box className='font-sans text-xl font-medium text-sky-950 flex flex-col justify-center'>Search Radius:</Box>
                         <Button onClick={()=>{setRadius(25)}}>25 Miles  </Button>
@@ -136,6 +141,7 @@ function SearchByAddress(props:PracticeUpdaterI){
     const [firstRequestMade, setFirstRequestMade] = useState(false)
 
     const update = () =>{
+        props.loadingOn()
         fetch(`/api/v1/providersearch/practices/locate/proximity?addr=${btoa(addr)}&radius=${radius}`).
         then(res => res.json()).
         then((res)=>{
@@ -145,6 +151,8 @@ function SearchByAddress(props:PracticeUpdaterI){
                 RadiusOrigin: [res["originLongitude"], res["originLatitude"]],
                 Radius: radius
             })
+        }).finally(()=>{
+            props.loadingOff()
         })
     }
 
@@ -155,20 +163,26 @@ function SearchByAddress(props:PracticeUpdaterI){
     },[radius])
 
     return(
-        <Box>
-            <TextInput value={addr} onChange={(e)=>{setAddr(e.currentTarget.value)}}/>
-            <Button onClick={()=>{
-                setFirstRequestMade(true)
-                update()
-            }}>Search</Button>
+        <Box className="w-full h-full p-2 flex flex-col gap-2">
+            <Box className="flex justify-center gap-2">
+                <Box className="w-100">
+                    <TextInput placeholder="Enter Address or City Name" value={addr} onChange={(e)=>{setAddr(e.currentTarget.value)}}/>
+                </Box>
+                <Box>
+                    <Button onClick={()=>{
+                        setFirstRequestMade(true)
+                        update()
+                    }}>Search</Button>
+                </Box>
+            </Box>
 
-            <Box className=''>
-                    <Box className="">
+            <Box className='flex flex-col items-center gap-2 justify-center'>
+                    <Box className="flex gap-2">
                         <Button onClick={()=>{setRadius(25)}}>25 Miles  </Button>
                         <Button onClick={()=>{setRadius(50)}}>50 Miles  </Button>
                         <Button onClick={()=>{setRadius(100)}}>100 Miles  </Button>
                     </Box>
-                    <Box className="text-center">
+                    <Box className="text-center font-sans">
                         Current: {radius} Miles
                     </Box>
             </Box>
@@ -238,8 +252,10 @@ function SearchByState(props:PracticeUpdaterI){
         "WYOMING": 'WY',
     }
     return(
-        <Box>
+        <Box className="flex justify-center font-sans text-xl items-center gap-2 w-full h-full">
+            <Box>Select State: </Box>
             <Select data={Object.keys(usStates)} onChange={(res)=>{
+                props.loadingOn()
                 fetch(`/api/v1/providersearch/practices/locate/state/`+usStates[res.valueOf()]).
                 then(res => res.json()).
                 then((res)=>{
@@ -247,7 +263,7 @@ function SearchByState(props:PracticeUpdaterI){
                     props.setMapCfg({
                         RadiusFeature: false,
                     })
-                })
+                }).finally(props.loadingOff)
             }}/>
         </Box>
     )
@@ -260,71 +276,71 @@ interface SelectedProps {
 
 function Selected(props:SelectedProps){
     const [practice, setPractice] = useState<PracticeI>()
-    const [providers, setProviders] = useState<ProviderListI>()
+    const [providers, setProviders] = useState<ProviderListI>({providers:[]})
+    const [practiceLoading, practiceLoader] = useDisclosure(false);
+    const [providerLoading, providerLoader] = useDisclosure(false);
 
     useEffect(()=>{
         if (props.practiceId != ""){
+            practiceLoader.open()
             fetch("/api/v1/providersearch/practice/"+props.practiceId).then((r) =>r.json()).then(pr=>{
                 setPractice(pr)
-            })
+            }).finally(practiceLoader.close)
 
+            providerLoader.open()
             fetch("/api/v1/providersearch/practice/"+props.practiceId+"/providers").then((r) =>r.json()).then(pr=>{
                 setProviders(pr)
-            })
+            }).finally(providerLoader.close)
         }
 
     }, [props.practiceId])
+
+
     
     if (practice === undefined) {
         return (
-            <Box className="text-center p-5 text-2xl text-white font-sans font-medium">No Practice Selected</Box>
-        )
-    } else {
-        let tableData: TableData = {
-            head: ["Name", "Tags"],
-            body: []
-        }
+            <Box pos="relative" className="flex flex-col gap-5 border-l-2 border-black h-full">
+                <LoadingOverlay visible={practiceLoading && providerLoading} zIndex={1000} overlayProps={{ radius: "md", blur: 1 }} />
+                <Box className="text-center font-sans text-2xl text-white font-medium bg-cyan-700 h-9 border-b-2">
+                        Selected Practice 
+                </Box>
 
-        if (providers != undefined){
-            for(let i = 0; i<providers.providers.length; i++){
-                tableData.body.push([providers.providers[i].name, providers.providers[i].tags])
-            }    
-        }
+                <Box className="text-center font-sans text-2xl text-black font-medium2">
+                        No Practice Selected
+                </Box>  
+            </Box>   
+             )
+    } else {
+        let rows:JSX.Element[] = []
+        rows = providers.providers.map((r, idx)=>{
+            return (
+                <Box className="">
+                    <Box key={idx} className="text-lg rounded bg-white text-gray-900 font-sans">{r.name}</Box>
+                    <Box className="font-semibold font-sans text-xs flex gap-1"><Box>Tags:</Box> {r.tags}</Box>
+                    <Divider/>
+                </Box>
+            )
+        })
 
         return (
-            <Box className="p-5 flex flex-col gap-5">
-                <Box className="text-center font-sans text-2xl text-white font-medium">
-                        Practice Info
+            <Box pos="relative" className="flex flex-col border-l-2 border-black h-159">
+                <LoadingOverlay visible={practiceLoading && providerLoading} zIndex={1000} overlayProps={{ radius: "md", blur: 1 }} />
+                <Box className="text-center font-sans text-2xl text-white font-medium bg-cyan-700 h-9 border-b-2">
+                        Selected Practice
                 </Box>
-                <Box className="text-white border-white border overflow-hidden font-sans flex flex-col gap-5 p-6 w-full justify-center text-wrap">
-                   
-                    <Box className="flex flex-row gap-2 justify-baseline flex-wrap">
-                        <Box className="text-sm w-20 font-medium">Name: </Box>
-                        <Box className="text-sm">{practice.name}</Box>
+                <Box className="h-full p-5 bg-white overflow-auto">
+                    <Box className="flex flex-col gap-1 justify-center text-center">
+                            <Box className="text-md font-semibold text-center">{practice.name}</Box>
+                            <Box className="text-sm text-center">{practice.fullAddress}</Box>
+                            <Box className="text-sm"><a  target="_blank" rel="noopener noreferrer" className="underline" href={practice.website}>{practice.website}</a></Box>
+                            <Box className="text-sm text-center">{practice.phone}</Box>
+                            <Box className="text-sm">{practice.tags}</Box>
                     </Box>
-                    <Box className="flex flex-row justify-baseline gap-2 flex-wrap">
-                        <Box className="text-sm font-medium w-20">Address: </Box>
-                        <Box className="text-sm">{practice.fullAddress}</Box>
+                    <Divider my="sm" labelPosition="center" label="Providers"/>
+                    <Box pos="relative" className="flex flex-col gap-2">
+                        {rows}                   
                     </Box>
-                    <Box className="flex flex-row justify-baseline gap-2 flex-wrap">
-                        <Box className="text-sm font-medium w-20">Website: </Box>
-                        <Box className="text-sm"><a  target="_blank" rel="noopener noreferrer" className="underline" href={practice.website}>{practice.website}</a></Box>
-                    </Box>
-                    <Box className="flex flex-row justify-baseline gap-2 flex-wrap">
-                        <Box className="text-sm font-medium w-20 ">Phone: </Box>
-                        <Box className="text-sm">{practice.phone}</Box>
-                    </Box>
-                    <Box className="flex flex-row justify-baseline gap-2 flex-wrap">
-                        <Box className="text-sm font-medium w-20">Tags: </Box>
-                        <Box className="text-sm">{practice.tags}</Box>
-                    </Box>
-                
                 </Box>
-                <Box className="text-center font-sans text-2xl text-white font-medium">
-                        Providers
-                </Box>
-                <Table className="font-sans text-white" withTableBorder data={tableData}></Table>
-
             </Box>
         )
     }  
@@ -341,24 +357,17 @@ export function PracticeTable(props: PracticeTableProps){
 
     rows = props.practiceList.practices.map((r, idx)=>{
         return (
-            <Table.Tr key={idx}>
-                <Table.Td onClick={ ()=>{props.updatedSelected(r.practiceId)}} className=" hover:bg-cyan-600 hover:cursor-pointer font-sans font-medium text-white">{r.name}</Table.Td> 
-            </Table.Tr>
+            <Box key={idx}>
+                <Box onClick={ ()=>{props.updatedSelected(r.practiceId)}} className="font-sans p-2 font-medium hover:bg-slate-100 outline m-1 hover:cursor-pointer rounded bg-white text-gray-900">{r.name}</Box> 
+            </Box>
         )
     })
 
     return (
-        <Box className="w-full h-75 md:h-150 md:rounded-bl-2xl bg-cyan-900 p-5 overflow-auto">
-            <Table withTableBorder>
-                <Table.Thead >
-                    <Table.Tr>
-                        <Table.Th className="font-sans font-bold text-lg text-white">Name</Table.Th>
-                    </Table.Tr>
-                </Table.Thead>
-                <Table.Tbody >
-                    {rows}
-                </Table.Tbody>
-            </Table>
+        <Box className="w-full h-75 md:h-150 md:rounded-bl-2xl bg-gray-100 p-5">
+            <Box className="overflow-auto h-full">
+                {rows}
+            </Box>
     </Box>
     )
 }
