@@ -26,7 +26,7 @@ export function DataDisplay() {
                         <Tabs.Tab value="state"><h1 className="font-sans text-white font-medium">State</h1></Tabs.Tab>
                     </Tabs.List>
                     <Tabs.Panel value="browse" className='flex justify-center w-full h-full'>
-                        <Browse setMapCfg={setMapCfg}  setPractices={setPractices}/>
+                        <Browse  loadingOn={open} loadingOff={close}  setMapCfg={setMapCfg}  setPractices={setPractices}/>
                     </Tabs.Panel>
                     <Tabs.Panel value="current" className='flex justify-center w-full h-full'>
                         <SearchByLocation loadingOn={open} loadingOff={close}  setMapCfg={setMapCfg} setPractices={setPractices}/>
@@ -60,19 +60,22 @@ export function DataDisplay() {
     )
 }
 
-interface BrowseProps {
+interface PracticeUpdaterI{
     setPractices: (props: LimitedPracticesListI) => void
     setMapCfg: (mapCfg: MapConfiguration) => void
+    loadingOn: () => void
+    loadingOff: () => void
 }
 
-function Browse(props: BrowseProps){
+function Browse(props: PracticeUpdaterI){
     
     useEffect(()=>{
+        props.loadingOn()
         fetch("/api/v1/providersearch/practices/all").then((r) =>r.json()).then(j=>{
             const pl: PracticeListI = j
             props.setPractices(pl)
             props.setMapCfg({RadiusFeature:false})
-        })
+        }).finally(props.loadingOff)
     }, [])
 
     return (
@@ -81,14 +84,6 @@ function Browse(props: BrowseProps){
         </Box>
     )
 }
-
-interface PracticeUpdaterI{
-    setPractices: (props: LimitedPracticesListI) => void
-    setMapCfg: (mapCfg: MapConfiguration) => void
-    loadingOn: () => void
-    loadingOff: () => void
-}
-
 
 function SearchByLocation(props:PracticeUpdaterI){
 
