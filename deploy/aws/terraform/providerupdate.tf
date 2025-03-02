@@ -34,6 +34,8 @@ resource "aws_apigatewayv2_route" "providerupdate" {
   api_id = aws_apigatewayv2_api.api.id
   route_key = "ANY ${local.providerupdate_basepath}/{proxy+}"
   target = "integrations/${aws_apigatewayv2_integration.providerupdate_integration.id}"
+  authorization_type = "JWT"
+  authorizer_id = aws_apigatewayv2_authorizer.authorizer.id
 }
 
 resource "aws_lambda_permission" "providerupdate_invoke" {
