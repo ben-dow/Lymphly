@@ -183,7 +183,7 @@ func LocatePracticeByState(w http.ResponseWriter, r *http.Request) {
 type ProximityResponse struct {
 	*LimitedPracticeList
 	OriginLatitude  float64 `json:"originLatitude,omitempty"`
-	OriginLongitude float64 `json:"originLongitute,omitempty"`
+	OriginLongitude float64 `json:"originLongitude,omitempty"`
 }
 
 func ProximitySearch(w http.ResponseWriter, r *http.Request) {

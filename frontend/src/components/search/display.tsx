@@ -141,7 +141,9 @@ function SearchByAddress(props:PracticeUpdaterI){
                 then((res)=>{
                     props.setPractices(res)
                     props.setMapCfg({
-                        RadiusFeature: false,
+                        RadiusFeature: true,
+                        RadiusOrigin: [res["originLongitude"], res["originLatitude"]],
+                        Radius: 25
                     })
                 })
             }}>Search</Button>
