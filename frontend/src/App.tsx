@@ -1,8 +1,8 @@
-import { AppShell} from '@mantine/core';
-import Header from './components/structure/header';
-import Body from './components/structure/body';
-import Footer from './components/structure/footer';
-import "./App.css"
+import { AppShell } from "@mantine/core";
+import "./App.css";
+import Body from "./components/structure/body";
+import Footer from "./components/structure/footer";
+import Header from "./components/structure/header";
 
 export default function App() {
   return (
@@ -12,19 +12,19 @@ export default function App() {
       padding="md"
       className="bg-sky-200 sm:h-screen  w-full"
       footer={{
-        height: 100
+        height: 100,
       }}
     >
       <AppShell.Header>
-        <Header/>
+        <Header />
       </AppShell.Header>
 
-      <AppShell.Main className='h-full w-full'>
-        <Body/>
+      <AppShell.Main className="h-full w-full">
+        <Body />
       </AppShell.Main>
 
       <AppShell.Footer>
-        <Footer/>
+        <Footer />
       </AppShell.Footer>
     </AppShell>
   );

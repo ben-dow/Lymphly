@@ -1,20 +1,13 @@
-import {Box, Button, Divider, Tabs, Text} from '@mantine/core'
-import 'radar-sdk-js/dist/radar.css'
-import { useEffect, useState } from 'react';
-import { PracticeListI } from '../../model/practice';
-import { DataDisplay, Map } from '../../components/search/display';
-import { Routes, Route, Router, useNavigate } from 'react-router';
+import { Box } from "@mantine/core";
+import "radar-sdk-js/dist/radar.css";
+import { DataDisplay } from "../../components/search/display";
 
-
-export default function Search(){
-    return(
-        <Box className={"p-5 w-full h-full flex flex-col gap-5"}>
-            <Box className='flex justify-center'>
-                <DataDisplay/>
-            </Box>
-        </Box>
-    )
+export default function Search() {
+  return (
+    <Box className={"p-5 w-full h-full flex flex-col gap-5"}>
+      <Box className="flex justify-center">
+        <DataDisplay />
+      </Box>
+    </Box>
+  );
 }
-
-
-
