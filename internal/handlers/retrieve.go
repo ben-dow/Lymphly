@@ -16,7 +16,7 @@ import (
 
 func RetrieveRoutes(r chi.Router) {
 	r.Get("/practices/all", AllPractices)
-	r.Get("/practices/locate/proximity", LocatePractice)
+	r.Get("/practices/locate/proximity", ProximitySearch)
 	r.Get("/practices/locate/state/{stateCode}", LocatePracticeByState)
 	r.Get("/practice/{practiceId}", GetPractice)
 	r.Get("/practice/{practiceId}/providers", GetPracticeByProviders)
@@ -180,7 +180,13 @@ func LocatePracticeByState(w http.ResponseWriter, r *http.Request) {
 	w.Write(outBytes)
 }
 
-func LocatePractice(w http.ResponseWriter, r *http.Request) {
+type ProximityResponse struct {
+	*LimitedPracticeList
+	OriginLatitude  float64 `json:"originLatitude,omitempty"`
+	OriginLongitude float64 `json:"originLongitute,omitempty"`
+}
+
+func ProximitySearch(w http.ResponseWriter, r *http.Request) {
 
 	/// Query Parameters
 	// lat, long
@@ -261,7 +267,11 @@ execute:
 		}
 	}
 
-	outBytes, _ := json.Marshal(resp)
+	outBytes, _ := json.Marshal(&ProximityResponse{
+		OriginLatitude:      lat,
+		OriginLongitude:     long,
+		LimitedPracticeList: resp,
+	})
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(outBytes)
 }
