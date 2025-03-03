@@ -23,7 +23,7 @@ func init() {
 }
 
 func AuthRoutes(r chi.Router) {
-	r.Get("/login", Manifest)
+	r.Get("/login", Login)
 }
 
 func Login(w http.ResponseWriter, r *http.Request) {
