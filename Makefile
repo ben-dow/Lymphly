@@ -35,7 +35,7 @@ build/frontend: build_dir
 	zip -r dist.zip dist/; \
 	mv dist.zip ${RELEASE_DIR}/frontend.zip
 
-build: build/frontend build/lambda/providersearch build/lambda/providerupdate
+build: build/frontend build/lambda/providersearch build/lambda/providerupdate build/lambda/auth
 
 clean:
 	rm -rf .build
