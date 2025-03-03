@@ -9,6 +9,7 @@ resource "aws_cognito_user_pool_client" "client" {
     "ALLOW_USER_PASSWORD_AUTH",
     "ALLOW_REFRESH_TOKEN_AUTH"
   ]
+  allowed_oauth_scopes= aws_cognito_resource_server.resource_server.scope_identifiers
 }
 
 resource "aws_cognito_user_pool_client" "programatic" {
@@ -18,6 +19,7 @@ resource "aws_cognito_user_pool_client" "programatic" {
     "ALLOW_USER_PASSWORD_AUTH",
     "ALLOW_REFRESH_TOKEN_AUTH"
   ]
+  allowed_oauth_scopes = aws_cognito_resource_server.resource_server.scope_identifiers
 }
 
 resource "aws_cognito_resource_server" "resource_server" {
