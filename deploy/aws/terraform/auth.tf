@@ -48,7 +48,7 @@ resource "aws_lambda_function" "auth_lambda" {
 resource "aws_apigatewayv2_integration" "auth_lambda" {
   api_id = aws_apigatewayv2_api.api.id
   integration_type = "AWS_PROXY"
-  integration_uri = aws_lambda_function.auth.arn
+  integration_uri = aws_lambda_function.auth_lambda.arn
   payload_format_version = "1.0"
 }
 
