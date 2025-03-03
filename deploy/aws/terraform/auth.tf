@@ -23,7 +23,7 @@ resource "aws_cognito_user_pool_client" "programatic" {
 resource "aws_cognito_resource_server" "resource_server" {
   name         = "${var.application_name}-${var.environment_name}"
   identifier   = aws_cloudfront_distribution.website.domain_name
-  user_pool_id = "${aws_cognito_user_pool.user_pool.id}"
+  user_pool_id = "${aws_cognito_user_pool.userpool.id}"
 
   scope {
     scope_name        = "all"
