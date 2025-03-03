@@ -9,7 +9,6 @@ resource "aws_cognito_user_pool_client" "client" {
     "ALLOW_USER_PASSWORD_AUTH",
     "ALLOW_REFRESH_TOKEN_AUTH"
   ]
-  allowed_oauth_scopes= aws_cognito_resource_server.resource_server.scope_identifiers
 }
 
 resource "aws_cognito_user_pool_client" "programatic" {
@@ -19,19 +18,8 @@ resource "aws_cognito_user_pool_client" "programatic" {
     "ALLOW_USER_PASSWORD_AUTH",
     "ALLOW_REFRESH_TOKEN_AUTH"
   ]
-  allowed_oauth_scopes = aws_cognito_resource_server.resource_server.scope_identifiers
 }
 
-resource "aws_cognito_resource_server" "resource_server" {
-  name         = "${var.application_name}-${var.environment_name}"
-  identifier   = aws_cloudfront_distribution.website.domain_name
-  user_pool_id = "${aws_cognito_user_pool.userpool.id}"
-
-  scope {
-    scope_name        = "all"
-    scope_description = "Get access to all API Gateway endpoints."
-  }
-}
 
 locals {
   auth_basepath = "/api/v1/auth"
