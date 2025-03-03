@@ -11,15 +11,6 @@ resource "aws_cognito_user_pool_client" "client" {
   ]
 }
 
-resource "aws_cognito_user_pool_client" "programatic" {
-  name = "${var.application_name}-${var.environment_name}-programatic"
-  user_pool_id = aws_cognito_user_pool.userpool.id
-  explicit_auth_flows = [
-    "ALLOW_USER_PASSWORD_AUTH",
-    "ALLOW_REFRESH_TOKEN_AUTH"
-  ]
-}
-
 
 locals {
   auth_basepath = "/api/v1/auth"
@@ -42,7 +33,7 @@ resource "aws_lambda_function" "auth_lambda" {
         REGION = var.deployment_region
         LOG_LEVEL = "INFO"
         POOL_ID = aws_cognito_user_pool.userpool.id
-        CLIENT_ID = aws_cognito_user_pool_client.programatic.id
+        CLIENT_ID = aws_cognito_user_pool_client.client.id
       }
     }
 }
