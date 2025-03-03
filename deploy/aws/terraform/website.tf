@@ -117,6 +117,28 @@ resource "aws_cloudfront_distribution" "website" {
       }
     }
   }
+
+  ordered_cache_behavior {
+    path_pattern     = "/api/v1/auth/login"
+    allowed_methods  = ["GET", "HEAD"]
+    cached_methods   = []
+    target_origin_id = aws_apigatewayv2_api.api.id
+    
+    forwarded_values {
+      query_string = true
+
+      cookies {
+        forward = "none"
+      }
+    }
+
+    min_ttl                = 0
+    default_ttl            = 0
+    max_ttl                = 0
+    compress               = true
+    viewer_protocol_policy = "redirect-to-https"
+  }
+
   ordered_cache_behavior {
     path_pattern     = "/api/*"
     allowed_methods  = ["GET", "HEAD", "OPTIONS", "PUT", "POST", "PATCH", "DELETE"]
