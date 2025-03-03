@@ -54,6 +54,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	outBytes, _ := json.Marshal(out)
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Cache-Control", "no-cache")
 	w.Write(outBytes)
 
 }
