@@ -20,6 +20,17 @@ resource "aws_cognito_user_pool_client" "programatic" {
   ]
 }
 
+resource "aws_cognito_resource_server" "resource_server" {
+  name         = "${var.application_name}-${var.environment_name}"
+  identifier   = aws_cloudfront_distribution.website.domain_name
+  user_pool_id = "${aws_cognito_user_pool.user_pool.id}"
+
+  scope {
+    scope_name        = "all"
+    scope_description = "Get access to all API Gateway endpoints."
+  }
+}
+
 locals {
   auth_basepath = "/api/v1/auth"
 }
