@@ -36,7 +36,7 @@ resource "aws_apigatewayv2_route" "providerupdate" {
   target = "integrations/${aws_apigatewayv2_integration.providerupdate_integration.id}"
   authorization_type = "JWT"
   authorizer_id = aws_apigatewayv2_authorizer.authorizer.id
-  authorization_scopes = [ aws_cognito_resource_server.resource_server.scope_identifiers ]
+  authorization_scopes = aws_cognito_resource_server.resource_server.scope_identifiers
 }
 
 resource "aws_lambda_permission" "providerupdate_invoke" {
