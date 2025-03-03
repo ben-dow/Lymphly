@@ -16,8 +16,10 @@ func main() {
 		r.Use(func(h http.Handler) http.Handler {
 			return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				w.Header().Set("Cache-Control", "no-cache")
+				h.ServeHTTP(w, r)
 			})
 		})
+
 		handlers.GeneralRoutes(r)
 		r.Put("/provider", handlers.PutNewProvider)
 	})
