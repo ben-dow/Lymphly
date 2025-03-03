@@ -13,6 +13,7 @@ func main() {
 	r := chi.NewRouter()
 	r.Route(cfg.Cfg().BasePath, func(r chi.Router) {
 		handlers.GeneralRoutes(r)
+		handlers.AuthRoutes(r)
 	})
 
 	adapter := chiadapter.New(r)

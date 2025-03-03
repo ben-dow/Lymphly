@@ -16,12 +16,17 @@ build/lambda/providersearch: build_dir
 	zip providersearch_lambda_x86_64.zip bootstrap; \
 	mv providersearch_lambda_x86_64.zip ${RELEASE_DIR}/providersearch_lambda_x86_64.zip
 
-
 build/lambda/providerupdate: build_dir
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -tags lambda.norpc -o ${BUILD_DIR}/providerupdate/bootstrap -ldflags "-s -w" ${ROOT_DIR}/cmd/providerupdate/main.go
 	cd ${BUILD_DIR}/providerupdate; \
 	zip providerupdate_lambda_x86_64.zip bootstrap; \
 	mv providerupdate_lambda_x86_64.zip ${RELEASE_DIR}/providerupdate_lambda_x86_64.zip
+
+build/lambda/auth: build_dir
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -tags lambda.norpc -o ${BUILD_DIR}/auth/bootstrap -ldflags "-s -w" ${ROOT_DIR}/cmd/auth/main.go
+	cd ${BUILD_DIR}/auth; \
+	zip auth_lambda_x86_64.zip bootstrap; \
+	mv auth_lambda_x86_64.zip ${RELEASE_DIR}/auth_lambda_x86_64.zip
 
 build/frontend: build_dir
 	cd frontend; \
