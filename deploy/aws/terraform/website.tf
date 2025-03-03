@@ -42,6 +42,16 @@ resource "aws_s3_bucket_website_configuration" "website" {
   }
 }
 
+resource "aws_s3_object" "vars" {
+  bucket = aws_s3_bucket.website_bucket.id
+  key = "authenv.json"
+  content = jsonencode({
+    authority = "https://cognito-idp.${var.deployment_region}.amazonaws.com/${aws_cognito_user_pool.userpool.id}"
+    clientId = aws_cognito_user_pool_client.client.id
+  })
+  content_type = "application/json"
+}
+
 resource "aws_s3_object" "dist" {
   for_each = fileset("${var.website_build_location}", "**/*.*")
   bucket = aws_s3_bucket.website_bucket.id
