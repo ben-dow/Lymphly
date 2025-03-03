@@ -4,8 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"log"
 	"lymphly/internal/cfg"
+	"lymphly/internal/log"
 	"net/http"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -39,13 +39,16 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		var resetRequired *types.PasswordResetRequiredException
 		if errors.As(err, &resetRequired) {
-			log.Println(*resetRequired.Message)
-		} else {
-			log.Printf("Couldn't sign in user %v. Here's why: %v\n", username, err)
+			w.Write([]byte(*resetRequired.Message))
+			w.WriteHeader(http.StatusBadRequest)
+			return
 		}
-	} else {
-		authResult = output.AuthenticationResult
+		log.Error("could not initiate login", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
+
+	authResult = output.AuthenticationResult
 
 	out := map[string]string{"token": *authResult.AccessToken}
 	outBytes, _ := json.Marshal(out)
