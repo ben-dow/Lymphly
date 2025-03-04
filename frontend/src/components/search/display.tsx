@@ -140,7 +140,7 @@ interface PracticeUpdaterI {
 function Browse(props: PracticeUpdaterI) {
   useEffect(() => {
     props.loadingOn();
-    fetch("/api/v1/providersearch/practices/all")
+    fetch("/api/public/v1/practices/all")
       .then((r) => r.json())
       .then((j) => {
         const pl: PracticeListI = j;
@@ -168,7 +168,7 @@ function SearchByLocation(props: PracticeUpdaterI) {
       let long = pos.coords.longitude;
       props.loadingOn();
       fetch(
-        `/api/v1/providersearch/practices/locate/proximity?lat=${lat}&long=${long}&radius=${radius}`,
+        `/api/public/v1/practices/locate/proximity?lat=${lat}&long=${long}&radius=${radius}`,
       )
         .then((res) => res.json())
         .then((res) => {
@@ -230,7 +230,7 @@ function SearchByAddress(props: PracticeUpdaterI) {
   const update = () => {
     props.loadingOn();
     fetch(
-      `/api/v1/providersearch/practices/locate/proximity?addr=${btoa(addr)}&radius=${radius}`,
+      `/api/public/v1/practices/locate/proximity?addr=${btoa(addr)}&radius=${radius}`,
     )
       .then((res) => res.json())
       .then((res) => {
@@ -375,7 +375,7 @@ function SearchByState(props: PracticeUpdaterI) {
         onChange={(res) => {
           props.loadingOn();
           fetch(
-            `/api/v1/providersearch/practices/locate/state/` +
+            `/api/public/v1/practices/locate/state/` +
             usStates[res.valueOf()],
           )
             .then((res) => res.json())
@@ -405,7 +405,7 @@ function Selected(props: SelectedProps) {
   useEffect(() => {
     if (props.practiceId != "") {
       practiceLoader.open();
-      fetch("/api/v1/providersearch/practice/" + props.practiceId)
+      fetch("/api/public/v1/practice/" + props.practiceId)
         .then((r) => r.json())
         .then((pr) => {
           setPractice(pr);
@@ -414,7 +414,7 @@ function Selected(props: SelectedProps) {
 
       providerLoader.open();
       fetch(
-        "/api/v1/providersearch/practice/" + props.practiceId + "/providers",
+        "/api/public/v1/practice/" + props.practiceId + "/providers",
       )
         .then((r) => r.json())
         .then((pr) => {

@@ -10,17 +10,17 @@ RELEASE_DIR=${BUILD_DIR}/releases
 build_dir:
 	mkdir -p ${BUILD_DIR} ${RELEASE_DIR}
 
-build/lambda/providersearch: build_dir
-	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -tags lambda.norpc -o ${BUILD_DIR}/providersearch/bootstrap -ldflags "-s -w" ${ROOT_DIR}/cmd/providersearch/main.go
-	cd ${BUILD_DIR}/providersearch; \
-	zip providersearch_lambda_x86_64.zip bootstrap; \
-	mv providersearch_lambda_x86_64.zip ${RELEASE_DIR}/providersearch_lambda_x86_64.zip
+build/lambda/public: build_dir
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -tags lambda.norpc -o ${BUILD_DIR}/public/bootstrap -ldflags "-s -w" ${ROOT_DIR}/cmd/public/main.go
+	cd ${BUILD_DIR}/public; \
+	zip public_lambda_x86_64.zip bootstrap; \
+	mv public_lambda_x86_64.zip ${RELEASE_DIR}/public_lambda_x86_64.zip
 
-build/lambda/providerupdate: build_dir
-	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -tags lambda.norpc -o ${BUILD_DIR}/providerupdate/bootstrap -ldflags "-s -w" ${ROOT_DIR}/cmd/providerupdate/main.go
-	cd ${BUILD_DIR}/providerupdate; \
-	zip providerupdate_lambda_x86_64.zip bootstrap; \
-	mv providerupdate_lambda_x86_64.zip ${RELEASE_DIR}/providerupdate_lambda_x86_64.zip
+build/lambda/private: build_dir
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -tags lambda.norpc -o ${BUILD_DIR}/private/bootstrap -ldflags "-s -w" ${ROOT_DIR}/cmd/private/main.go
+	cd ${BUILD_DIR}/private; \
+	zip private_lambda_x86_64.zip bootstrap; \
+	mv private_lambda_x86_64.zip ${RELEASE_DIR}/private_lambda_x86_64.zip
 
 build/lambda/auth: build_dir
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -tags lambda.norpc -o ${BUILD_DIR}/auth/bootstrap -ldflags "-s -w" ${ROOT_DIR}/cmd/auth/main.go
@@ -35,7 +35,7 @@ build/frontend: build_dir
 	zip -r dist.zip dist/; \
 	mv dist.zip ${RELEASE_DIR}/frontend.zip
 
-build: build/frontend build/lambda/providersearch build/lambda/providerupdate build/lambda/auth
+build: build/frontend build/lambda/public build/lambda/private build/lambda/auth
 
 clean:
 	rm -rf .build
