@@ -5,6 +5,8 @@ import (
 	"io"
 	"lymphly/internal/data"
 	"net/http"
+
+	"github.com/go-chi/chi/v5"
 )
 
 type NewProviderRequest struct {
@@ -15,6 +17,10 @@ type NewProviderRequest struct {
 	Website      string `json:"website"`
 	ProviderTags string `json:"providerTags"`
 	PracticeTags string `json:"practiceTags"`
+}
+
+func ModificationRoutes(r chi.Router) {
+	r.Put("/provider", PutNewProvider)
 }
 
 func PutNewProvider(w http.ResponseWriter, r *http.Request) {
