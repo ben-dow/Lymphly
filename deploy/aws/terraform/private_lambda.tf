@@ -2,7 +2,7 @@ locals {
   private_basepath = "/api/private/v1"
 }
 
-resource "aws_lambda_function" "private_labmda" {
+resource "aws_lambda_function" "private_lambda" {
     filename = "${var.releases_path}/private_lambda_x86_64.zip"
     function_name = "${var.application_name}_${var.environment_name}_private"
     role = aws_iam_role.lambda_execute_role.arn
