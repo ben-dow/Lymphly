@@ -14,6 +14,7 @@ func main() {
 	r.Route(cfg.Cfg().BasePath, func(r chi.Router) {
 		handlers.GeneralRoutes(r)
 		handlers.RetrieveRoutes(r)
+		handlers.AuthRoutes(r)
 	})
 
 	adapter := chiadapter.New(r)
