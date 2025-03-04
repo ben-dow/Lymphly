@@ -20,6 +20,8 @@ resource "aws_lambda_function" "public_lambda" {
         TABLE_NAME = aws_dynamodb_table.lymphly-table.name
         LOG_LEVEL = "INFO"
         RADAR_PRIVATE_KEY = var.radar_secret_key
+        POOL_ID = aws_cognito_user_pool.userpool.id
+        CLIENT_ID = aws_cognito_user_pool_client.client.id
       }
     }
 }
