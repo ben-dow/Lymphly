@@ -6,6 +6,9 @@ import (
 	"github.com/caarlos0/env/v11"
 )
 
+var defaultCfg *Config
+
+// initialization of configuration at package import time
 func init() {
 	cfg := &Config{
 		Version: "1.0",
@@ -18,12 +21,12 @@ func init() {
 	defaultCfg = cfg
 }
 
-var defaultCfg *Config
-
+// Accessor for Default Configuration
 func Cfg() *Config {
 	return defaultCfg
 }
 
+// Configuration Definition
 type Config struct {
 	AppName         string `env:"APP_NAME"`
 	Environment     string `env:"ENV_NAME"`

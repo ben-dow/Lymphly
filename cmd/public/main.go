@@ -9,6 +9,11 @@ import (
 	chi "github.com/go-chi/chi/v5"
 )
 
+// This is the entry function into the lambda handler for the private endpoint of the Lymphly API
+// The Lymphly API utilizes Chi as a router and the lambda-go-api-proxy to convert from Lambda requests
+// fed by an API Gateway to HTTP requests that are able to be handled by the Chi router and Std Library HTTP Routes
+//
+// All routes in this API are expected to be cached
 func main() {
 	r := chi.NewRouter()
 	r.Route(cfg.Cfg().BasePath, func(r chi.Router) {
