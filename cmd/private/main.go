@@ -21,6 +21,7 @@ func main() {
 		})
 
 		handlers.GeneralRoutes(r)
+		handlers.RetrieveRoutes(r)
 		r.Put("/provider", handlers.PutNewProvider)
 	})
 
