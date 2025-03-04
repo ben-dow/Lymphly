@@ -26,7 +26,7 @@ resource "aws_lambda_function" "private_lambda" {
 resource "aws_apigatewayv2_integration" "private_integration" {
   api_id = aws_apigatewayv2_api.api.id
   integration_type = "AWS_PROXY"
-  integration_uri = aws_lambda_function.private_labmda.arn
+  integration_uri = aws_lambda_function.private_lambda.arn
   payload_format_version = "1.0"
 }
 
@@ -42,7 +42,7 @@ resource "aws_apigatewayv2_route" "private" {
 resource "aws_lambda_permission" "private_invoke" {
   statement_id = "AllowExecutionFromAPIGateway"
   action = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.private_labmda.function_name
+  function_name = aws_lambda_function.private_lambda.function_name
   principal = "apigateway.amazonaws.com"
   source_arn = "${aws_apigatewayv2_api.api.execution_arn}/*/*" 
 }
