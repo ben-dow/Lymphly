@@ -31,5 +31,9 @@ build/frontend: build_dir
 
 build: build/frontend build/lambda/public build/lambda/private
 
+unit-test: 
+	mkdir -p ${BUILD_DIR}/test
+	go test -cover ./... -coverprofile=${BUILD_DIR}/test/cover.out
+	go tool cover -html=${BUILD_DIR}/test/cover.out -o ${BUILD_DIR}/test/cover.html
 clean:
 	rm -rf .build

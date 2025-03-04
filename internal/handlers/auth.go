@@ -17,9 +17,16 @@ func AuthRoutes(r chi.Router) {
 
 // GetLogin handles GET requests to login and retrieve a JWT token
 func GetLogin(w http.ResponseWriter, r *http.Request) {
+
+	// Parse Credentials from Request
 	username := r.Header.Get("x-username")
 	password := r.Header.Get("x-password")
+	if username == "" || password == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
 
+	// Get Token
 	accessToken, err := auth.GetAccessToken(r.Context(), username, password)
 	if err != nil {
 		if errors.Is(err, auth.ErrPasswordReset) || errors.Is(err, context.Canceled) {
