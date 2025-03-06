@@ -9,6 +9,17 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
+var (
+	putPracticeFunc = data.PutPractice
+	putProviderFunc = data.PutProvider
+)
+
+// Routes relating to the modification of data
+func ModificationRoutes(r chi.Router) {
+	r.Put("/provider", PutNewProvider)
+}
+
+// Expected body of requests to create a new provider
 type NewProviderRequest struct {
 	Name         string `json:"name"`
 	Practice     string `json:"practice"`
@@ -19,10 +30,7 @@ type NewProviderRequest struct {
 	PracticeTags string `json:"practiceTags"`
 }
 
-func ModificationRoutes(r chi.Router) {
-	r.Put("/provider", PutNewProvider)
-}
-
+// Creates a New Provider and Practice if they do not yet exist
 func PutNewProvider(w http.ResponseWriter, r *http.Request) {
 	// Ready Body
 	b, err := io.ReadAll(r.Body)
@@ -35,19 +43,19 @@ func PutNewProvider(w http.ResponseWriter, r *http.Request) {
 	requestBody := &NewProviderRequest{}
 	err = json.Unmarshal(b, requestBody)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	// Save Practice
-	savedPractice, err := data.PutPractice(r.Context(), requestBody.Practice, requestBody.FullAddress, requestBody.Phone, requestBody.Website, requestBody.PracticeTags)
+	savedPractice, err := putPracticeFunc(r.Context(), requestBody.Practice, requestBody.FullAddress, requestBody.Phone, requestBody.Website, requestBody.PracticeTags)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
 	// Save Provider
-	_, err = data.PutProvider(r.Context(), requestBody.Name, requestBody.ProviderTags, savedPractice)
+	_, err = putProviderFunc(r.Context(), requestBody.Name, requestBody.ProviderTags, savedPractice)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return

@@ -15,6 +15,10 @@ func AuthRoutes(r chi.Router) {
 	r.Get("/login", GetLogin)
 }
 
+var (
+	getAccessTokenFunc = auth.GetAccessToken
+)
+
 // GetLogin handles GET requests to login and retrieve a JWT token
 func GetLogin(w http.ResponseWriter, r *http.Request) {
 
@@ -27,7 +31,7 @@ func GetLogin(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Get Token
-	accessToken, err := auth.GetAccessToken(r.Context(), username, password)
+	accessToken, err := getAccessTokenFunc(r.Context(), username, password)
 	if err != nil {
 		if errors.Is(err, auth.ErrPasswordReset) || errors.Is(err, context.Canceled) {
 			w.WriteHeader(http.StatusBadRequest)
@@ -43,8 +47,8 @@ func GetLogin(w http.ResponseWriter, r *http.Request) {
 	outBytes, _ := json.Marshal(out)
 
 	// Write Response
-	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Cache-Control", "no-cache")
+	w.WriteHeader(http.StatusOK)
 	w.Write(outBytes)
 }

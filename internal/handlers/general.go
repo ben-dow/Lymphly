@@ -1,31 +1,18 @@
 package handlers
 
 import (
-	"encoding/json"
-	"lymphly/internal/cfg"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
 )
 
+// GeneralRoutes are non-domain routes for information about the service
 func GeneralRoutes(r chi.Router) {
 	r.Get("/health", Health)
-	r.Get("/manifest", Manifest)
 }
 
+// Health returns a 200 if the service is okay. 
 func Health(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Cache-Control", "no-cache")
 	w.WriteHeader(http.StatusOK)
-}
-
-type ManifestResponse struct {
-	Version string
-}
-
-func Manifest(w http.ResponseWriter, r *http.Request) {
-	resp := &ManifestResponse{
-		Version: cfg.Cfg().Version,
-	}
-	b, _ := json.Marshal(resp)
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(b)
 }

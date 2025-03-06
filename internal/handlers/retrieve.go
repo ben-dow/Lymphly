@@ -14,8 +14,13 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
+var (
+	enumerateAllPracticesFunc = data.EnumerateAllPractices
+)
+
+// Routes related to retrieval of data
 func RetrieveRoutes(r chi.Router) {
-	r.Get("/practices/all", AllPractices)
+	r.Get("/practices/all", GetAllPractices)
 	r.Get("/practices/locate/proximity", ProximitySearch)
 	r.Get("/practices/locate/state/{stateCode}", LocatePracticeByState)
 	r.Get("/practice/{practiceId}", GetPractice)
@@ -24,6 +29,7 @@ func RetrieveRoutes(r chi.Router) {
 	r.Get("/provider/{providerId}/practice", GetPracticeByProvider)
 }
 
+// LimitedPracticeItem is a truncated amount of data about a practice
 type LimitedPracticeItem struct {
 	PracticeId string  `json:"practiceId,"`
 	Name       string  `json:"name"`
@@ -31,12 +37,14 @@ type LimitedPracticeItem struct {
 	Longitude  float64 `json:"longitude"`
 }
 
+// LimistedPracticeList is a list of limited practices
 type LimitedPracticeList struct {
 	Practices []LimitedPracticeItem `json:"practices"`
 }
 
-func AllPractices(w http.ResponseWriter, r *http.Request) {
-	d, err := data.EnumerateAllPractices(r.Context())
+// Retrieves all Practices from the Database
+func GetAllPractices(w http.ResponseWriter, r *http.Request) {
+	d, err := enumerateAllPracticesFunc(r.Context())
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
@@ -60,6 +68,7 @@ func AllPractices(w http.ResponseWriter, r *http.Request) {
 	w.Write(outBytes)
 }
 
+// Retrieves a Single Practice from the database
 func GetPractice(w http.ResponseWriter, r *http.Request) {
 	practiceId := chi.URLParam(r, "practiceId")
 	if practiceId == "" {
@@ -78,11 +87,13 @@ func GetPractice(w http.ResponseWriter, r *http.Request) {
 	w.Write(practiceBytes)
 }
 
+// Response Body for all Providers for a Given Practice
 type ProvidersByPracticeResponse struct {
 	PracticeId string          `json:"practiceId"`
 	Providers  []data.Provider `json:"providers"`
 }
 
+// Retrieves all Providers for a given practice Id
 func GetPracticeByProviders(w http.ResponseWriter, r *http.Request) {
 	practiceId := chi.URLParam(r, "practiceId")
 	if practiceId == "" {
@@ -106,6 +117,7 @@ func GetPracticeByProviders(w http.ResponseWriter, r *http.Request) {
 	w.Write(respBytes)
 }
 
+// Retrieves a given provider from the database
 func GetProvider(w http.ResponseWriter, r *http.Request) {
 	providerId := chi.URLParam(r, "providerId")
 	if providerId == "" {
@@ -124,6 +136,7 @@ func GetProvider(w http.ResponseWriter, r *http.Request) {
 	w.Write(responseBytes)
 }
 
+// Retrieves the Practice from a given provider id
 func GetPracticeByProvider(w http.ResponseWriter, r *http.Request) {
 	providerId := chi.URLParam(r, "providerId")
 	if providerId == "" {
@@ -148,6 +161,7 @@ func GetPracticeByProvider(w http.ResponseWriter, r *http.Request) {
 	w.Write(practiceBytes)
 }
 
+// Given a State, lists all practices within
 func LocatePracticeByState(w http.ResponseWriter, r *http.Request) {
 	stateCode := chi.URLParam(r, "stateCode")
 	if stateCode == "" {
@@ -180,12 +194,14 @@ func LocatePracticeByState(w http.ResponseWriter, r *http.Request) {
 	w.Write(outBytes)
 }
 
+// Results of a Proximity Search
 type ProximityResponse struct {
 	*LimitedPracticeList
 	OriginLatitude  float64 `json:"originLatitude,omitempty"`
 	OriginLongitude float64 `json:"originLongitude,omitempty"`
 }
 
+// Searches in the proximity of a location for practices
 func ProximitySearch(w http.ResponseWriter, r *http.Request) {
 
 	/// Query Parameters
@@ -223,11 +239,7 @@ func ProximitySearch(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
-		goto execute
-	}
-
-	// If not Lat/Long, Check Address
-	if addrB64 != "" {
+	} else if addrB64 != "" {
 		addrBytes, err := base64.URLEncoding.DecodeString(addrB64)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
@@ -243,10 +255,8 @@ func ProximitySearch(w http.ResponseWriter, r *http.Request) {
 
 		lat = addrGeocode.Addresses[0].Latitude
 		long = addrGeocode.Addresses[0].Longitude
-		goto execute
 	}
 
-execute:
 	practices, err := data.GetPracticesByProximity(r.Context(), lat, long, radiusMi)
 	if err != nil {
 		log.Error("failed to query practices by proximity", err)
