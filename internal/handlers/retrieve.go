@@ -15,7 +15,13 @@ import (
 )
 
 var (
-	enumerateAllPracticesFunc = data.EnumerateAllPractices
+	enumerateAllPracticesFunc     = data.EnumerateAllPractices
+	getPracticeFunc               = data.GetPractice
+	getProvidersByPracticeIdFunc  = data.GetProvidersByPracticeId
+	getProviderFunc               = data.GetProvider
+	enumeratePracticesByStateFunc = data.EnumeratePracticesByState
+	getPracticesByProximityFunc   = data.GetPracticesByProximity
+	geocodeAddrFunc               = geo.GeocodeAddress
 )
 
 // Routes related to retrieval of data
@@ -24,7 +30,7 @@ func RetrieveRoutes(r chi.Router) {
 	r.Get("/practices/locate/proximity", ProximitySearch)
 	r.Get("/practices/locate/state/{stateCode}", LocatePracticeByState)
 	r.Get("/practice/{practiceId}", GetPractice)
-	r.Get("/practice/{practiceId}/providers", GetPracticeByProviders)
+	r.Get("/practice/{practiceId}/providers", GetPracticeProviders)
 	r.Get("/provider/{providerId}", GetProvider)
 	r.Get("/provider/{providerId}/practice", GetPracticeByProvider)
 }
@@ -76,7 +82,7 @@ func GetPractice(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	practice, err := data.GetPractice(r.Context(), practiceId)
+	practice, err := getPracticeFunc(r.Context(), practiceId)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
@@ -88,26 +94,26 @@ func GetPractice(w http.ResponseWriter, r *http.Request) {
 }
 
 // Response Body for all Providers for a Given Practice
-type ProvidersByPracticeResponse struct {
+type PracticeProvidersResponse struct {
 	PracticeId string          `json:"practiceId"`
 	Providers  []data.Provider `json:"providers"`
 }
 
 // Retrieves all Providers for a given practice Id
-func GetPracticeByProviders(w http.ResponseWriter, r *http.Request) {
+func GetPracticeProviders(w http.ResponseWriter, r *http.Request) {
 	practiceId := chi.URLParam(r, "practiceId")
 	if practiceId == "" {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	providers, err := data.GetProvidersByPracticeId(r.Context(), practiceId)
+	providers, err := getProvidersByPracticeIdFunc(r.Context(), practiceId)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	response := &ProvidersByPracticeResponse{
+	response := &PracticeProvidersResponse{
 		PracticeId: practiceId,
 		Providers:  providers,
 	}
@@ -125,7 +131,7 @@ func GetProvider(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	provider, err := data.GetProvider(r.Context(), providerId)
+	provider, err := getProviderFunc(r.Context(), providerId)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
@@ -144,13 +150,13 @@ func GetPracticeByProvider(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	provider, err := data.GetProvider(r.Context(), providerId)
+	provider, err := getProviderFunc(r.Context(), providerId)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	practice, err := data.GetPractice(r.Context(), provider.PracticeId)
+	practice, err := getPracticeFunc(r.Context(), provider.PracticeId)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
@@ -170,7 +176,7 @@ func LocatePracticeByState(w http.ResponseWriter, r *http.Request) {
 	}
 
 	stateCode = strings.ToUpper(stateCode)
-	practices, err := data.EnumeratePracticesByState(r.Context(), stateCode)
+	practices, err := enumeratePracticesByStateFunc(r.Context(), stateCode)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
@@ -247,9 +253,12 @@ func ProximitySearch(w http.ResponseWriter, r *http.Request) {
 		}
 		addr := string(addrBytes)
 
-		addrGeocode, err := geo.GeocodeAddress(addr)
+		addrGeocode, err := geocodeAddrFunc(addr)
 		if errors.Is(err, geo.ErrBadAddress) {
 			w.WriteHeader(http.StatusBadRequest)
+			return
+		} else if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
 
@@ -257,7 +266,7 @@ func ProximitySearch(w http.ResponseWriter, r *http.Request) {
 		long = addrGeocode.Addresses[0].Longitude
 	}
 
-	practices, err := data.GetPracticesByProximity(r.Context(), lat, long, radiusMi)
+	practices, err := getPracticesByProximityFunc(r.Context(), lat, long, radiusMi)
 	if err != nil {
 		log.Error("failed to query practices by proximity", err)
 		w.WriteHeader(http.StatusInternalServerError)
