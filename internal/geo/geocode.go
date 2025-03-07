@@ -59,7 +59,6 @@ type GeocodeResponse struct {
 var ErrBadAddress = errors.New("address was bad")
 
 func GeocodeAddress(addr string) (*GeocodeResponse, error) {
-
 	req, err := http.NewRequest("GET", "https://api.radar.io/v1/geocode/forward?query="+url.QueryEscape(addr), nil)
 	if err != nil {
 		return nil, err
@@ -110,7 +109,6 @@ func InRadius(originLat, originLong, destLat, destLong float64, radiusMi int) (f
 }
 
 func Neighbors(hash string, depth int) []string {
-
 	s := map[string]bool{}
 	s[hash] = false
 
