@@ -148,7 +148,7 @@ resource "aws_cloudfront_distribution" "website" {
     cached_methods   = ["GET", "HEAD"]
     target_origin_id = aws_s3_bucket.website_bucket.id
     function_association {
-      event_type = "viewer_request"
+      event_type = "viewer-request"
       function_arn = aws_cloudfront_function.default-directory-index.arn
     }
 
