@@ -39,3 +39,4 @@ unit-test:
 	go tool cover -html=${BUILD_DIR}/test/cover.out -o ${BUILD_DIR}/test/cover.html
 clean:
 	rm -rf .build
+	rm -rf frontend/dist
