@@ -38,6 +38,8 @@ export TF_VAR_deployment_region="$DEPLOYMENT_REGION"
 export TF_VAR_releases_path="$RELEASES_PATH"
 export TF_VAR_website_build_location="$RELEASES_PATH/dist/"
 export TF_VAR_radar_secret_key="$RADAR_SECRET_KEY"
+export TF_VAR_dns_root="$DNS_ROOT"
+export TF_VAR_dns_subdomain="$DNS_SUBDOMAIN"
 
 terraform apply -auto-approve
 

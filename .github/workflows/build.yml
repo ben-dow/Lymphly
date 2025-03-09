@@ -58,6 +58,8 @@ jobs:
       RELEASES_PATH: ${{ github.workspace }}/releases
       RADAR_PUBLIC_KEY: ${{ secrets.RADAR_PUBLISHABLE_API_KEY }}
       RADAR_SECRET_KEY: ${{ secrets.RADAR_SECRET_API_KEY }}
+      DNS_ROOT: ${{ vars.DNS_ROOT }}
+      DNS_SUBDOMAIN: ${{ vars.DNS_SUBDOMAIN }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
