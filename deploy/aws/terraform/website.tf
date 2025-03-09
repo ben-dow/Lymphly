@@ -171,7 +171,7 @@ resource "aws_cloudfront_distribution" "website" {
       error_caching_min_ttl = 0
       error_code            = 403
       response_code         = 200
-      response_page_path    = "/404.html"
+      response_page_path    = "/index.html"
     }
 
   restrictions {
