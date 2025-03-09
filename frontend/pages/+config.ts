@@ -9,6 +9,8 @@ export default {
   // https://vike.dev/Layout
   Layout,
 
+  prerender: true,
+
   // https://vike.dev/head-tags
   title: "Lymphly",
   description: "Lymphly",
