@@ -11,7 +11,7 @@ export default function HeadDefault() {
       <div className="flex flex-col justify-center h-full">
         <div className="w-25 flex items-center h-full bg-sky-600">
           <h4 className="text-sky-100 text-xl text-center w-full font-sans font-medium">
-            Search
+            <a href="/search">Search</a>
           </h4>
         </div>
       </div>
