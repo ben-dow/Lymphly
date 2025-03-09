@@ -147,6 +147,10 @@ resource "aws_cloudfront_distribution" "website" {
     allowed_methods  = ["GET", "HEAD", "OPTIONS"]
     cached_methods   = ["GET", "HEAD"]
     target_origin_id = aws_s3_bucket.website_bucket.id
+    function_association {
+      event_type = "viewer_request"
+      function_arn = aws_cloudfront_function.default-directory-index
+    }
 
     forwarded_values {
       query_string = false
@@ -179,6 +183,13 @@ resource "aws_cloudfront_distribution" "website" {
     acm_certificate_arn = aws_acm_certificate.cert.arn
     ssl_support_method = "sni-only"
   }
+}
+
+resource "aws_cloudfront_function" "default-directory-index" {
+  name    = "${var.application_name}-${var.environment_name}-default-directory-index"
+  runtime = "cloudfront-js-2.0"
+  publish = true
+  code    = file("${path.module}/default-directory-index.js")
 }
 
 resource "null_resource" "invalidate_cache"{
