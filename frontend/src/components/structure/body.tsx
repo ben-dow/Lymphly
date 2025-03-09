@@ -1,5 +1,5 @@
 import { Navigate, Route, Routes } from "react-router";
-import Search from "../../pages/search/search";
+import Search from "../../pages/search";
 
 export default function Body() {
   return (
