@@ -22,3 +22,11 @@ variable "website_build_location"{
 variable "radar_secret_key"{
   type=string
 }
+
+variable "dns_root"{
+  type=string
+}
+
+variable "dns_subdomain"{
+  type=string
+}

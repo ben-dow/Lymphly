@@ -84,6 +84,8 @@ resource "aws_cloudfront_distribution" "website" {
   default_root_object = "index.html"
   price_class = "PriceClass_100"
 
+  aliases = ["${var.dns_subdomain}.${var.dns_root}"]
+
   origin {
     domain_name = aws_s3_bucket.website_bucket.bucket_regional_domain_name
     origin_id  = aws_s3_bucket.website_bucket.id
@@ -174,7 +176,8 @@ resource "aws_cloudfront_distribution" "website" {
     }
   }
   viewer_certificate {
-    cloudfront_default_certificate = true
+    acm_certificate_arn = aws_acm_certificate.cert.arn
+    ssl_support_method = "sni-only"
   }
 }
 
