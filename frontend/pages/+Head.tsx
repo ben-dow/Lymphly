@@ -1,4 +1,5 @@
-export default function Header() {
+
+export default function HeadDefault() {
   return (
     <div className="bg-sky-900 h-full flex  justify-around">
       <div className="flex flex-col justify-center">

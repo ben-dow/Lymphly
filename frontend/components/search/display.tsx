@@ -12,7 +12,7 @@ import { Position } from "geojson";
 import { LngLatLike } from "maplibre-gl";
 import Radar from "radar-sdk-js";
 import RadarMap from "radar-sdk-js/dist/ui/RadarMap";
-import { useEffect, useState } from "react";
+import { JSX, useEffect, useState } from "react";
 import {
   LimitedPracticePracticeListI as LimitedPracticesListI,
   PracticeI,

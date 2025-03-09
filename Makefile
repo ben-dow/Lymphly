@@ -26,6 +26,8 @@ build/frontend: build_dir
 	cd frontend; \
 	npm install; \
 	npm run build; \
+	cd dist; \
+	mv client dist; \
 	zip -r dist.zip dist/; \
 	mv dist.zip ${RELEASE_DIR}/frontend.zip
 
