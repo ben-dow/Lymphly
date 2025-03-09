@@ -149,7 +149,7 @@ resource "aws_cloudfront_distribution" "website" {
     target_origin_id = aws_s3_bucket.website_bucket.id
     function_association {
       event_type = "viewer_request"
-      function_arn = aws_cloudfront_function.default-directory-index
+      function_arn = aws_cloudfront_function.default-directory-index.arn
     }
 
     forwarded_values {
