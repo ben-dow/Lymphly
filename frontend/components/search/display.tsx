@@ -29,13 +29,13 @@ export function DataDisplay() {
   const [visible, { open, close }] = useDisclosure(false);
 
   return (
-    <Box pos={"relative"} className="flex flex-col w-full md:w-7xl">
+    <Box pos={"relative"} className="flex flex-col w-full h-full">
       <LoadingOverlay
         visible={visible}
         zIndex={1000}
         overlayProps={{ radius: "md", blur: 1 }}
       />
-      <Box className="w-full flex justify-center rounded-tl-xl bg-white">
+      <Box className="w-full flex justify-center rounded-tl-xl bg-white min-h-50 max-h-100">
         <Tabs
           defaultValue={"browse"}
           className="w-full"
@@ -98,8 +98,8 @@ export function DataDisplay() {
           </Tabs.Panel>
         </Tabs>
       </Box>
-      <Box className="flex flex-col md:flex-row w-full justify-center border-t">
-        <Tabs defaultValue={"Map"} className="w-full md:w-7/8 max-w-5xl">
+      <Box className="flex flex-col md:flex-row w-full justify-center border-t h-full">
+        <Tabs defaultValue={"Map"} className="w-full h-1/2 md:h-full">
           <Tabs.List className="bg-cyan-700  md:rounded-tr-none">
             <Tabs.Tab value="Map">
               <h1 className="font-sans text-white font-medium">Map</h1>
@@ -115,14 +115,14 @@ export function DataDisplay() {
               practiceList={practices}
             />
           </Tabs.Panel>
-          <Tabs.Panel value="Table" className="h-full w-full">
+          <Tabs.Panel value="Table" className="h-full w-full flex justify-center">
             <PracticeTable
               practiceList={practices}
               updatedSelected={setSelectedPractice}
             />
           </Tabs.Panel>
         </Tabs>
-        <Box className="md:h-full md:w-xs min-h-25 w-full  bg-gray-100 ">
+        <Box className="md:w-xs w-full bg-gray-100 h-1/2 md:h-full">
           <Selected practiceId={selectedPractice} />
         </Box>
       </Box>
@@ -466,7 +466,7 @@ function Selected(props: SelectedProps) {
     return (
       <Box
         pos="relative"
-        className="flex flex-col border-l-2 border-black h-159"
+        className="flex flex-col border-l-2 border-black h-full"
       >
         <LoadingOverlay
           visible={practiceLoading && providerLoading}
@@ -515,22 +515,21 @@ export function PracticeTable(props: PracticeTableProps) {
 
   rows = props.practiceList.practices.map((r, idx) => {
     return (
-      <Box key={idx}>
-        <Box
-          onClick={() => {
-            props.updatedSelected(r.practiceId);
-          }}
-          className="font-sans p-2 font-medium hover:bg-slate-100 outline m-1 hover:cursor-pointer rounded bg-white text-gray-900"
-        >
-          {r.name}
-        </Box>
+      <Box
+        key={idx}
+        onClick={() => {
+          props.updatedSelected(r.practiceId);
+        }}
+        className="font-sans p-1 font-medium hover:bg-slate-100 outline m-1 hover:cursor-pointer rounded bg-white text-gray-900"
+      >
+        {r.name}
       </Box>
     );
   });
 
   return (
-    <Box className="w-full h-75 md:h-150 md:rounded-bl-2xl bg-gray-100 p-5">
-      <Box className="overflow-auto h-full">{rows}</Box>
+    <Box className="w-full h-full overflow-auto md:rounded-bl-2xl bg-gray-100 p-1">
+      {rows}
     </Box>
   );
 }
@@ -632,7 +631,7 @@ export function Map(props: MapProps) {
     }
   }, [props.practiceList, props.mapConfiguration, map]);
 
-  return <div id="map" className="w-full h-75 md:h-150 md:rounded-b-2xl" />;
+  return <div id="map" style={{ "height": `calc(100% - 30px)` }} className="w-full min-h-100 md:rounded-b-2xl" />;
 }
 
 function ZoneCoords(
